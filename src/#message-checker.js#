@@ -1,0 +1,11 @@
+/**
+ * message-checker.js
+ */
+
+const self = {
+  init: () => {
+    // ...
+  },
+};
+
+module.exports = self;

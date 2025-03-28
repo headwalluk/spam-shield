@@ -1,0 +1,38 @@
+{
+  "name": "spam-shield",
+  "version": "3.0.0",
+  "description": "Spam message classifier and IP address reputation database and web interface.",
+  "keywords": [
+    "spam",
+    "api",
+    "ip",
+    "repuation"
+  ],
+  "homepage": "https://github.com/headwalluk/spam-shield#readme",
+  "bugs": {
+    "url": "https://github.com/headwalluk/spam-shield/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/headwalluk/spam-shield.git"
+  },
+  "license": "MIT",
+  "author": "headwaluk",
+  "type": "commonjs",
+  "main": "./src/app.js",
+  "scripts": {
+    "start": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@headwall/easy-cronjs": "^1.1.4",
+    "@headwall/qw-render": "^1.0.10",
+    "@headwall/trusted-network-providers": "^1.6.0",
+    "body-parser": "^2.2.0",
+    "compression": "^1.8.0",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "nodemon": "^3.1.9"
+  }
+}

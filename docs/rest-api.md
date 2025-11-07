@@ -22,7 +22,7 @@ http://<your-server-address>/api/v3/auth
 
 ### 1. Message Scoring
 
-#### POST /api/messages
+#### POST /api/v3/messages
 
 Submits a message for spam scoring.
 
@@ -52,7 +52,7 @@ Submits a message for spam scoring.
 
 ### 2. IP Reputation
 
-#### GET /api/ip-reputation/:ip
+#### GET /api/v3/ip-reputation/:ip
 
 Retrieves the reputation information for a given IP address.
 

@@ -8,6 +8,8 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const apiRoutes = require('./routes/api/index');
 const webRoutes = require('./routes/web/index');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./docs/swagger');
 const errorHandler = require('./middleware/errorHandler');
 const session = require('express-session');
 const KnexSessionStore = require('connect-session-knex')(session);
@@ -64,6 +66,13 @@ app.set('view engine', 'pug');
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Swagger API docs (UI)
+app.use('/docs/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Raw spec JSON
+app.get('/api-docs.json', (req, res) => {
+  res.json(swaggerSpec);
+});
 
 // Route integration
 app.use('/api', apiRoutes);

@@ -10,6 +10,15 @@ const homeController = new HomeController();
 // Define web routes
 router.get('/', homeController.renderHomePage.bind(homeController));
 router.get('/stats', homeController.renderStatsPage.bind(homeController));
+router.get('/docs', (req, res) => {
+  res.render('pages/docs', {
+    title: 'Documentation',
+    links: {
+      apiUi: '/docs/api',
+      apiSpec: '/api-docs.json'
+    }
+  });
+});
 
 // Auth pages
 router.get('/login', (req, res) => {

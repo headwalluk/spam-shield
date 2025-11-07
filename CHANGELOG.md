@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2025-11-07
+### Added
+- Swagger UI available at `/docs/api` with auto-generated OpenAPI spec from JSDoc annotations (`/api-docs.json`).
+- `/docs` landing page in the web UI linking to API documentation.
+
+### Changed
+- All API endpoints consolidated under versioned namespace `/api/v3` (messages, IP reputation, auth).
+
 ## [0.1.0] - 2025-11-07
 ### Added
 - Initial project scaffolding: Express server, Pug views, REST API routing (`/api`), web routes, and basic site layout.

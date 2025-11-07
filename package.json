@@ -1,6 +1,6 @@
 {
   "name": "spam-shield",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Node.js application for spam detection and IP reputation management.",
   "main": "src/server.js",
   "scripts": {
@@ -30,7 +30,9 @@
     "nodemailer": "^6.9.14",
     "passport-headerapikey": "^1.2.2",
     "passport-local": "^1.0.0",
-    "pug": "^3.0.2"
+    "pug": "^3.0.2",
+    "swagger-ui-express": "^5.0.0",
+    "swagger-jsdoc": "^6.2.8"
   },
   "devDependencies": {
     "jest": "^27.0.6",

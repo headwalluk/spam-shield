@@ -1,0 +1,9 @@
+extends ../layouts/main.pug
+
+block content
+  .container.mt-4
+    h1 Documentation
+    p This area will grow. For now you can explore the API via the Swagger UI or view the raw OpenAPI specification.
+    ul
+      li: a(href=links.apiUi) Swagger UI (/docs/api)
+      li: a(href=links.apiSpec) Raw OpenAPI JSON (/api-docs.json)

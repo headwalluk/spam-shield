@@ -13,6 +13,7 @@ Spam Shield is a Node.js application designed to provide a REST API for spam det
 - **Auto Migrate & Seed (dev)**: On startup in development, pending migrations are applied and baseline roles ensured.
 - **Database**: MySQL/MariaDB supported through `mysql2` driver.
 - **Tooling**: ESLint (flat config) enforcing brace style & quality rules; Prettier for formatting.
+ - **Tooling**: ESLint (flat config) enforcing brace style & quality rules; Prettier for formatting; Swagger UI at `/docs/api` with raw spec at `/api-docs.json`.
 
 ## Project Structure
 
@@ -97,7 +98,7 @@ All models (messages, users, roles, licences) use Knex (`src/db/knex.js`). User-
 
 ## API Documentation
 
-For detailed information on the API endpoints, please refer to the [REST API Documentation](docs/rest-api.md). Authentication endpoints are under `/api/v3/auth`.
+For detailed information on the API endpoints, please refer to the [REST API Documentation](docs/rest-api.md). All endpoints are versioned under the `/api/v3` namespace (e.g. `/api/v3/messages`, `/api/v3/ip-reputation`, `/api/v3/auth/*`).
 
 Registration does not log a user in; they remain in `pending` status until the email verification link is consumed. Attempts to login before verification return a specific error code.
 

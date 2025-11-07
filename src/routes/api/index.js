@@ -1,12 +1,12 @@
 const express = require('express');
-const messagesRouter = require('./messages');
-const ipReputationRouter = require('./ip-reputation');
-const authRouter = require('./auth');
+const v3MessagesRouter = require('./v3/messages');
+const v3IpReputationRouter = require('./v3/ip-reputation');
+const v3AuthRouter = require('./v3/auth');
 
 const router = express.Router();
 
-router.use('/messages', messagesRouter);
-router.use('/ip-reputation', ipReputationRouter);
-router.use('/v3/auth', authRouter);
+router.use('/v3/messages', v3MessagesRouter);
+router.use('/v3/ip-reputation', v3IpReputationRouter);
+router.use('/v3/auth', v3AuthRouter);
 
 module.exports = router;

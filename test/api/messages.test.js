@@ -4,7 +4,7 @@ const app = require('../../src/app');
 describe('Messages API', () => {
   it('should create a new message', async () => {
     const response = await request(app)
-  .post('/api/v3/messages')
+      .post('/api/v3/messages')
       .send({
         text: 'This is a test message',
         sender: 'test@example.com'
@@ -17,7 +17,7 @@ describe('Messages API', () => {
 
   it('should retrieve a message by ID', async () => {
     const messageId = 1; // Assuming a message with ID 1 exists
-  const response = await request(app).get(`/api/v3/messages/${messageId}`).expect(200);
+    const response = await request(app).get(`/api/v3/messages/${messageId}`).expect(200);
 
     expect(response.body).toHaveProperty('id', messageId);
   });
@@ -25,7 +25,7 @@ describe('Messages API', () => {
   it('should update a message', async () => {
     const messageId = 1; // Assuming a message with ID 1 exists
     const response = await request(app)
-  .put(`/api/v3/messages/${messageId}`)
+      .put(`/api/v3/messages/${messageId}`)
       .send({
         text: 'This is an updated test message'
       })
@@ -36,12 +36,12 @@ describe('Messages API', () => {
 
   it('should delete a message', async () => {
     const messageId = 1; // Assuming a message with ID 1 exists
-  await request(app).delete(`/api/v3/messages/${messageId}`).expect(204);
+    await request(app).delete(`/api/v3/messages/${messageId}`).expect(204);
   });
 
   it('should return 404 for a non-existing message', async () => {
     const messageId = 999; // Assuming this ID does not exist
-  const response = await request(app).get(`/api/v3/messages/${messageId}`).expect(404);
+    const response = await request(app).get(`/api/v3/messages/${messageId}`).expect(404);
 
     expect(response.body).toHaveProperty('error', 'Message not found');
   });

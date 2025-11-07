@@ -11,9 +11,7 @@ const options = {
       description:
         'API for spam detection, IP reputation, and authentication. This is an early draft and will evolve.'
     },
-    servers: [
-      { url: config.auth.baseUrl || `http://localhost:${config.server.listenPort}` }
-    ],
+    servers: [{ url: config.auth.baseUrl || `http://localhost:${config.server.listenPort}` }],
     components: {
       securitySchemes: {
         SessionCookie: {

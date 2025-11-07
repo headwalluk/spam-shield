@@ -13,7 +13,7 @@ Spam Shield is a Node.js application designed to provide a REST API for spam det
 - **Auto Migrate & Seed (dev)**: On startup in development, pending migrations are applied and baseline roles ensured.
 - **Database**: MySQL/MariaDB supported through `mysql2` driver.
 - **Tooling**: ESLint (flat config) enforcing brace style & quality rules; Prettier for formatting.
- - **Tooling**: ESLint (flat config) enforcing brace style & quality rules; Prettier for formatting; Swagger UI at `/docs/api` with raw spec at `/api-docs.json`.
+- **Tooling**: ESLint (flat config) enforcing brace style & quality rules; Prettier for formatting; Swagger UI at `/docs/api` with raw spec at `/api-docs.json`.
 
 ## Project Structure
 

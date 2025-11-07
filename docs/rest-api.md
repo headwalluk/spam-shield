@@ -78,18 +78,18 @@ Retrieves the reputation information for a given IP address.
 
 Email verification is required before a user can log in. Most auth endpoints return JSON error codes (`EMAIL_EXISTS`, `INVALID_CREDENTIALS`, `EMAIL_NOT_VERIFIED`, etc.).
 
-| Purpose | Method & Path | Notes |
-|---------|---------------|-------|
-| Register | `POST /api/v3/auth/register` | Returns user (pending status) or `EMAIL_EXISTS`. Triggers verification email. |
-| Login | `POST /api/v3/auth/login` | Fails with `EMAIL_NOT_VERIFIED` until user active. Sets session cookie. |
-| Me (session) | `GET /api/v3/auth/me` | Requires cookie session; returns user id/email/roles. |
-| Issue API key | `POST /api/v3/auth/issue-key` | Authenticated; returns new API key string (only shown once). |
-| Me (API key) | `GET /api/v3/auth/me-apikey` | Requires `X-API-Key` header. |
-| Password reset request | `POST /api/v3/auth/reset-password` | Returns `{}` even if email not found (no leak). |
-| Consume password reset | `POST /api/v3/auth/reset-password/consume` | Provide `token` + `password`. |
-| Verify email | `GET /api/v3/auth/verify-email?token=...` | Activates user; returns user JSON. |
-| Resend verification | `POST /api/v3/auth/resend-verification` | Cooldown enforced; may return `VERIFY_RESEND_COOLDOWN`. |
-| Generate password | `GET /api/v3/auth/generate-password` | Returns strong generated password matching policy. |
+| Purpose                | Method & Path                              | Notes                                                                         |
+| ---------------------- | ------------------------------------------ | ----------------------------------------------------------------------------- |
+| Register               | `POST /api/v3/auth/register`               | Returns user (pending status) or `EMAIL_EXISTS`. Triggers verification email. |
+| Login                  | `POST /api/v3/auth/login`                  | Fails with `EMAIL_NOT_VERIFIED` until user active. Sets session cookie.       |
+| Me (session)           | `GET /api/v3/auth/me`                      | Requires cookie session; returns user id/email/roles.                         |
+| Issue API key          | `POST /api/v3/auth/issue-key`              | Authenticated; returns new API key string (only shown once).                  |
+| Me (API key)           | `GET /api/v3/auth/me-apikey`               | Requires `X-API-Key` header.                                                  |
+| Password reset request | `POST /api/v3/auth/reset-password`         | Returns `{}` even if email not found (no leak).                               |
+| Consume password reset | `POST /api/v3/auth/reset-password/consume` | Provide `token` + `password`.                                                 |
+| Verify email           | `GET /api/v3/auth/verify-email?token=...`  | Activates user; returns user JSON.                                            |
+| Resend verification    | `POST /api/v3/auth/resend-verification`    | Cooldown enforced; may return `VERIFY_RESEND_COOLDOWN`.                       |
+| Generate password      | `GET /api/v3/auth/generate-password`       | Returns strong generated password matching policy.                            |
 
 API key auth uses a `headerapikey` strategy expecting header `X-API-Key: <key>`.
 

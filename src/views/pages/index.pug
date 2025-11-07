@@ -1,0 +1,22 @@
+extends ../layouts/main
+
+block content
+  .row
+    .col-lg-8
+      h1.h3.mb-3 Welcome to Spam Shield
+      p.lead This application helps you analyze messages for spam content and check IP address reputations.
+      p Use the navigation to access the APIs, view statistics, or manage your account.
+      .mt-4
+        a.btn.btn-primary.me-2(href='/register') Get Started
+        a.btn.btn-outline-secondary(href='/login') Sign In
+    .col-lg-4
+      .card
+        .card-header Quick Links
+        .card-body
+          ul.list-unstyled.mb-0
+            li.mb-2
+              a(href='/stats') View statistics
+            li.mb-2
+              a(href='/api/v3/auth/me') Auth status (JSON)
+            li
+              a(href='/reset-password') Reset password

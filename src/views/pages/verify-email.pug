@@ -1,0 +1,14 @@
+extends ../layouts/main
+
+block content
+  .row.justify-content-center
+    .col-md-8.col-lg-6
+      h1.h3.mb-3 Email verification
+      if success
+        .alert.alert-success(role='status')= success
+        p You can now proceed to 
+          a(href='/login') log in
+          | .
+      if error
+        .alert.alert-danger(role='alert')= error
+        p If you believe this is an error, request a new verification email by resetting your password or registering again.

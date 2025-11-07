@@ -1,0 +1,18 @@
+extends ../layouts/main
+
+block content
+  .row.justify-content-center
+    .col-md-8.col-lg-6
+      h1.h3.mb-3 Resend verification email
+      if success
+        .alert.alert-success(role='status')= success
+      if error
+        .alert.alert-danger(role='alert')= error
+      form(method='post' action='/verify-email/resend')
+        .mb-3
+          label.form-label(for='email') Email
+          input.form-control(type='email' name='email' id='email' required value=prefill)
+        .d-grid
+          button.btn.btn-primary(type='submit') Send link
+      .mt-3
+        a.btn.btn-link.btn-sm(href='/login') Back to login

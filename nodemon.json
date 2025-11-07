@@ -1,4 +1,15 @@
 {
-  "verbose": false,
-  "ext": "js, html, css, svg"
+  "watch": [
+    "src/**/*.js",
+    "src/**/*.pug",
+    "src/public/css/**/*.css",
+    "src/public/js/**/*.js",
+    "knexfile.js"
+  ],
+  "ext": "js,json,pug,css",
+  "ignore": ["node_modules", "test", "migrations", "seeds", "_old - to be deleted - ignore this"],
+
+  "env": {
+    "NODE_ENV": "development"
+  }
 }

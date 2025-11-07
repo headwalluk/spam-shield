@@ -1,53 +1,75 @@
 /**
- * app.js
- *
- * Spam Shield
- *
+ * Main application file
  */
-
-const config = require('./config');
-
-const path = require('path');
-// const fs = require('fs');
+console.log(`Starting Spam Shield application NODE_ENV=${process.env.NODE_ENV}`);
 const express = require('express');
-// const helmet = require('helmet');
-// const compression = require('compression');
-// const bodyParser = require('body-parser');
+const path = require('path');
+// const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const apiRoutes = require('./routes/api/index');
+const webRoutes = require('./routes/web/index');
+const errorHandler = require('./middleware/errorHandler');
+const session = require('express-session');
+const KnexSessionStore = require('connect-session-knex')(session);
+const config = require('./config');
+const passport = require('./middleware/passport');
+const db = require('./db/knex');
 
-const renderer = require('@headwall/qw-render');
-
-const projectDir = path.dirname(__dirname);
-console.log(`Project dir: ${projectDir}`);
-
-renderer.setContentDir(path.join(projectDir, 'content'));
-// renderer.applyThemeOverlay(path.join(projectDir, 'theme'));
-renderer.addFilter('outputHtml', null, (content, params) => {
-  const state = {};
-  return content.replace('</head>', `<script>const ss=${JSON.stringify(state)};</script></head>`);
-});
-
-// const port = 3080;
 const app = express();
 
-// app.get('/', (req, res) => {
-//   res.send('Hello World!');
-// });
+// Middleware setup
+// app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-/**
- * Unsecured content.
- */
-//app.post('/api/v1/session/authenticate', sessionController.authenticate);
-// app.get(['/login', /(assets|login)\/.*\.(css|js|svg)$/], (req, res) => {
-//   renderer.sendFile(req, res);
-// });
+// Session & Passport (cookie auth)
+// Use DB-backed session store in non-test environments to persist sessions
+const useDbSessionStore = config.env !== 'test';
+const store = useDbSessionStore
+  ? new KnexSessionStore({
+      knex: db,
+      tablename: 'web_sessions', // dedicated table for express-session store
+      createtable: true,
+      clearInterval: 600000 // clear expired sessions every 10 minutes
+    })
+  : undefined; // Jest/test uses MemoryStore to avoid DB dependency
 
-/**
- * Other files
- */
-app.get([], (req, res) => {
-  renderer.sendFile(req, res, null);
+app.use(
+  session({
+    name: config.auth.sessionCookieName,
+    secret: config.auth.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    store,
+    cookie: {
+      httpOnly: true,
+      secure: config.env === 'production',
+      sameSite: 'lax'
+    }
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Expose common locals to all views
+app.use((req, res, next) => {
+  res.locals.user = req.user;
+  res.locals.enableRegistration = config.auth.enableRegistration;
+  next();
 });
 
-app.listen(config.server.port, () => {
-  console.log(`Example app listening on port ${config.server.port}`);
-});
+// View engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+// Static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Route integration
+app.use('/api', apiRoutes);
+app.use('/', webRoutes);
+
+// Error handling middleware
+app.use(errorHandler);
+
+module.exports = app;

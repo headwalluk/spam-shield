@@ -1,0 +1,17 @@
+extends ../layouts/main
+include ../mixins/forms
+
+block content
+  .row.justify-content-center
+    .col-md-6.col-lg-5
+      h1.h3.mb-3 Sign in
+      if error
+        .alert.alert-danger(role='alert')= error
+      form(method='post' action='/login')
+        +formGroup('email', 'Email', 'email')
+        +formGroup('password', 'Password', 'password')
+        +submitRow('Sign in')
+      .mt-3.d-flex.flex-wrap.gap-2
+        a.btn.btn-outline-secondary.btn-sm(href='/register') Register
+        a.btn.btn-link.btn-sm(href='/reset-password') Reset password
+        a.btn.btn-link.btn-sm(href='/verify-email/resend') Resend verification email

@@ -1,5 +1,50 @@
 # Changelog
 
+## [0.4.0] - 2025-11-08
+
+- Major refactor. Got rid of Pug and replaced it with static HTML assets and mor ein-browser rendering.
+
+## [0.3.2] - 2025-11-08
+
+### Added
+
+- Handlebars-based email templating system (`src/email-templates/*.hbs`).
+- Template loader/cacher (`src/services/emailTemplates.js`).
+- Unit tests for template rendering (`emailTemplates.test.js`).
+
+### Changed
+
+- `mailerService` now renders emails via Handlebars templates instead of inline string construction.
+
+### Notes
+
+- To add new emails, drop a `<name>.hbs` in `src/email-templates` and call `mailerService.sendTemplate(to, subject, '<name>', locals)`.
+
+## [0.3.3] - 2025-11-08
+
+### Changed
+
+- Moved static asset sources from `src/public` to root-level `public/` for a cleaner `src/` tree.
+- Build output directory updated to `public/build/` (supports future optional `dist/` usage).
+- Server now serves from `public/` and, if present, `dist/` first.
+- Updated nodemon watch paths and README documentation accordingly.
+
+### Notes
+
+- Existing HTML pages now reside under `public/html`. Update any deployment scripts expecting `src/public`.
+
+## [0.3.1] - 2025-11-08
+
+### Changed
+
+- Removed Pug templating from the application. Front-end is now fully static HTML + JS consuming cookie-authenticated APIs.
+- Email templates no longer rely on Pug; replaced with a lightweight inline HTML renderer for the verification email.
+- Development watcher updated to stop monitoring `.pug` files.
+
+### Notes
+
+This completes the transition away from SSR templates. Future emails can use simple HTML template functions or a minimal templating helper if needed.
+
 ## [0.3.0] - 2025-11-08
 
 ### Added

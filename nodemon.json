@@ -1,12 +1,12 @@
 {
   "watch": [
     "src/**/*.js",
-    "src/**/*.pug",
-    "src/public/css/**/*.css",
-    "src/public/js/**/*.js",
+    "public/css/**/*.css",
+    "public/js/**/*.js",
+    "public/html/**/*.html",
     "knexfile.js"
   ],
-  "ext": "js,json,pug,css",
+  "ext": "js,json,css,html",
   "ignore": ["node_modules", "test", "migrations", "seeds", "_old - to be deleted - ignore this"],
 
   "env": {

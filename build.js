@@ -16,24 +16,64 @@ async function run() {
         name: 'main-js',
         options: {
           ...sharedConfig,
-          entryPoints: ['src/assets/js/index.js'],
-          outfile: 'src/public/build/bundle.js'
+          entryPoints: ['public/js/index.js'],
+          outfile: 'public/build/bundle.js'
+        }
+      },
+      {
+        name: 'login-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/login.js'],
+          outfile: 'public/build/login.bundle.js'
         }
       },
       {
         name: 'dashboard-js',
         options: {
           ...sharedConfig,
-          entryPoints: ['src/public/js/dashboard.js'],
-          outfile: 'src/public/build/dashboard.bundle.js'
+          entryPoints: ['public/js/dashboardPage.js'],
+          outfile: 'public/build/dashboard.bundle.js'
+        }
+      },
+      {
+        name: 'api-keys-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/api-keys.js'],
+          outfile: 'public/build/api-keys.bundle.js'
+        }
+      },
+      {
+        name: 'admin-users-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/admin-users.js'],
+          outfile: 'public/build/admin-users.bundle.js'
+        }
+      },
+      {
+        name: 'register-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/register.js'],
+          outfile: 'public/build/register.bundle.js'
+        }
+      },
+      {
+        name: 'reset-password-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/reset-password.js'],
+          outfile: 'public/build/reset-password.bundle.js'
         }
       },
       {
         name: 'css',
         options: {
           ...sharedConfig,
-          entryPoints: ['src/assets/css/index.css'],
-          outfile: 'src/public/build/bundle.css',
+          entryPoints: ['public/css/index.css'],
+          outfile: 'public/build/bundle.css',
           loader: {
             '.woff': 'file',
             '.woff2': 'file',
@@ -59,16 +99,19 @@ async function run() {
       return contexts;
     }
 
-  await Promise.all(tasks.map((t) => esbuild.build(t.options)));
+    await Promise.all(tasks.map((t) => esbuild.build(t.options)));
     // Emit manifest.json (only runtime asset filenames)
     const manifest = {
       generatedAt: new Date().toISOString(),
       watch: isWatch,
-      assets: tasks.map((t) => ({ type: t.name, file: t.options.outfile.replace('src/public/', '') }))
+      assets: tasks.map((t) => ({ type: t.name, file: t.options.outfile.replace('public/', '') }))
     };
     const fs = require('fs');
     const path = require('path');
-    fs.writeFileSync(path.join(__dirname, 'src', 'public', 'build', 'manifest.json'), JSON.stringify(manifest, null, 2));
+    fs.writeFileSync(
+      path.join(__dirname, 'public', 'build', 'manifest.json'),
+      JSON.stringify(manifest, null, 2)
+    );
     console.log('Build completed');
   } catch (err) {
     console.error('Build failed', err);

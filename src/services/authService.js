@@ -67,7 +67,14 @@ class AuthService {
     if (!keyRow) {
       return null;
     }
-    return userModel.findById(keyRow.user_id);
+    const user = await userModel.findById(keyRow.user_id);
+    if (!user) {
+      return null;
+    }
+    // Eagerly load roles for downstream authorization
+    const roles = await userModel.getRoles(user.id);
+    user.roles = roles.map((r) => r.name);
+    return user;
   }
 
   async createPasswordReset(user_id) {

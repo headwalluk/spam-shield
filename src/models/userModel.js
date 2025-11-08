@@ -1,9 +1,27 @@
 const db = require('../db/knex');
+const bcrypt = require('bcryptjs');
 
 class UserModel {
-  async create({ email, password_hash, status_slug = 'active' }) {
-    const [id] = await db('users').insert({ email, password_hash, status_slug });
+  async create(email, password) {
+    const password_hash = await bcrypt.hash(password, 10);
+    const [id] = await db('users').insert({ email, password_hash, status_slug: 'active' });
     return id;
+  }
+
+  async findAll({ page = 1, limit = 10, email } = {}) {
+    const query = db('users')
+      .select('users.*', db.raw('GROUP_CONCAT(roles.name SEPARATOR ", ") as roles'))
+      .leftJoin('user_roles', 'users.id', 'user_roles.user_id')
+      .leftJoin('roles', 'user_roles.role_id', 'roles.id')
+      .groupBy('users.id');
+
+    if (email) {
+      query.where('users.email', 'like', `%${email}%`);
+    }
+
+    const offset = (page - 1) * limit;
+    query.limit(limit).offset(offset);
+    return query;
   }
 
   async findById(id) {
@@ -26,7 +44,7 @@ class UserModel {
     return this.findById(id);
   }
 
-  async delete(id) {
+  async deleteById(id) {
     return db('users').where({ id }).del();
   }
 

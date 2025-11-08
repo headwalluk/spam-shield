@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
-const pug = require('pug');
-const path = require('path');
 const config = require('../config');
+const emailTemplates = require('./emailTemplates');
 
 let transport;
 function getTransport() {
@@ -19,8 +18,7 @@ function getTransport() {
 }
 
 function renderTemplate(name, locals) {
-  const file = path.join(__dirname, '..', 'views', 'emails', `${name}.pug`);
-  return pug.renderFile(file, { ...locals, baseUrl: config.auth.baseUrl });
+  return emailTemplates.render(name, locals);
 }
 
 class MailerService {

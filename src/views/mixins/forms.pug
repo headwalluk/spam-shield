@@ -1,8 +1,0 @@
-mixin formGroup(id, label, type='text', value='', attrs={})
-  .mb-3
-    label.form-label(for=id)= label
-    input.form-control(type=type id=id name=id value=value ...attrs)
-
-mixin submitRow(label='Submit')
-  .d-grid
-    button.btn.btn-primary(type='submit')= label

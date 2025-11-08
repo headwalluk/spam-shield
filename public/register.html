@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register - Spam Shield</title>
+    <link rel="icon" type="image/webp" href="/headwall-icon.webp" />
+    <link rel="preload" href="/build/bundle.css" as="style" />
+    <link rel="stylesheet" href="/build/bundle.css" />
+    <script defer src="/build/bundle.js"></script>
+    <script defer src="/build/register.bundle.js"></script>
+  </head>
+  <body>
+    <div id="header-placeholder"></div>
+    <main class="container py-4">
+      <h1 class="mb-3">Create your account</h1>
+      <form id="register-form" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="reg-email" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="reg-email" name="email" required />
+          <div class="invalid-feedback">Valid email required.</div>
+        </div>
+        <div class="mb-3">
+          <label for="reg-password" class="form-label">Password</label>
+          <input
+            type="password"
+            class="form-control"
+            id="reg-password"
+            name="password"
+            required
+            minlength="8"
+          />
+          <div class="form-text">Must meet strength policy.</div>
+          <div class="invalid-feedback">Please enter a valid password.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+        <a href="/login" class="btn btn-link">Already have an account?</a>
+      </form>
+      <div id="register-result" class="mt-3"></div>
+    </main>
+    <div id="footer-placeholder" class="mt-5"></div>
+  </body>
+</html>

@@ -42,6 +42,12 @@ exports.up = async function (knex) {
     table.timestamp('created_at').defaultTo(knex.fn.now());
   });
 
+  // Licence Types
+  await knex.schema.createTable('licence_types', (table) => {
+    table.string('slug').primary();
+    table.string('title').notNullable();
+  });
+
   // Licences (one-to-one with users)
   await knex.schema.createTable('licences', (table) => {
     table.increments('id').primary();
@@ -53,7 +59,7 @@ exports.up = async function (knex) {
       .references('id')
       .inTable('users')
       .onDelete('CASCADE');
-    table.enu('licence_type', ['unmetered', 'daily-metered']).notNullable().defaultTo('unmetered');
+    table.string('licence_type').notNullable().references('slug').inTable('licence_types');
     // Time of day reset for daily-metered licences in UTC (HH:MM:SS)
     table.time('daily_reset_time_utc').nullable();
     table.timestamp('created_at').defaultTo(knex.fn.now());
@@ -75,6 +81,7 @@ exports.up = async function (knex) {
 exports.down = async function (knex) {
   await knex.schema.dropTableIfExists('user_roles');
   await knex.schema.dropTableIfExists('licences');
+  await knex.schema.dropTableIfExists('licence_types');
   await knex.schema.dropTableIfExists('users');
   await knex.schema.dropTableIfExists('roles');
   // messages table intentionally left (comment below) because existing code depends on it.

@@ -11,6 +11,10 @@ class ApiKeyModel {
   async listByUser(user_id) {
     return db('api_keys').where({ user_id }).whereNull('revoked_at').select('*');
   }
+  async findById(id) {
+    return db('api_keys').where({ id }).first();
+  }
+
   async revoke(id) {
     return db('api_keys').where({ id }).update({ revoked_at: db.fn.now() });
   }

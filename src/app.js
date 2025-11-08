@@ -1,9 +1,12 @@
 /**
  * Main application file
  */
+
 console.log(`Starting Spam Shield application NODE_ENV=${process.env.NODE_ENV}`);
+
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 // const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const apiRoutes = require('./routes/api/index');
@@ -54,19 +57,21 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Expose common locals to all views
-app.use((req, res, next) => {
-  res.locals.user = req.user;
-  res.locals.enableRegistration = config.auth.enableRegistration;
+// (Static HTML front-end now; no server-side view engine)
+app.use((req, _res, next) => {
+  // Keep a lightweight hook if future middleware needs user/config
+  req._ui = { user: req.user, enableRegistration: config.auth.enableRegistration };
   next();
 });
 
-// View engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files: prefer /dist if present, else /public (both at project root)
+const projectRoot = path.join(__dirname, '..');
+const distDir = path.join(projectRoot, 'dist');
+const publicDir = path.join(projectRoot, 'public');
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+}
+app.use(express.static(publicDir));
 
 // Swagger API docs (UI)
 app.use('/docs/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

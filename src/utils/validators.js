@@ -79,5 +79,42 @@ module.exports = {
       }
     }
     return { valid: errors.length === 0, errors };
+  },
+
+  generatePassword: (policy) => {
+    const p = policy || {
+      minLength: 12,
+      requireUpper: true,
+      requireLower: true,
+      requireDigit: true,
+      requireSymbol: true,
+      symbols: '!@#$%^&*()-_=+[]{};:,.<>/?',
+      generateLength: 16
+    };
+    const length = p.generateLength || p.minLength;
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const digits = '0123456789';
+    const symbols = p.symbols;
+
+    let charset = '';
+    if (p.requireUpper) {
+      charset += upper;
+    }
+    if (p.requireLower) {
+      charset += lower;
+    }
+    if (p.requireDigit) {
+      charset += digits;
+    }
+    if (p.requireSymbol) {
+      charset += symbols;
+    }
+
+    let password = '';
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return password;
   }
 };

@@ -1,14 +1,14 @@
 # Spam Shield
 
-Spam Shield is a Node.js application designed to provide a REST API for spam detection and IP reputation management. The application features a web interface rendered using Pug, allowing users to interact with the API and view statistics.
+Spam Shield is a Node.js application designed to provide a REST API for spam detection and IP reputation management. The application ships a static HTML front-end that consumes the same cookie-authenticated API endpoints.
 
 ## Features
 
 - **REST API**: Submit messages for scoring, retrieve spam metrics, check IP address reputation.
-- **Web Interface (Pug)**: Thin server-rendered pages (no heavy SPA) for basic admin and stats.
+- **Web Interface (Static HTML)**: Lightweight static pages (no heavy SPA) for basic admin and stats.
 - **Role-Based Access**: `user` and `administrator` roles (seeded) with groundwork for expansion; first user auto-promoted to `administrator` in development.
 - **Licence Management**: Per-user licence (one-to-one) supporting `unmetered` or `daily-metered` types with UTC daily reset time.
-- **Authentication Workflow**: Email verification required before login; password reset flow; API key issuance.
+- **Authentication Workflow**: Email verification required before login; password reset flow; API key issuance. Verification emails use Handlebars templates in `src/email-templates`.
 - **Unified Data Layer**: All models use Knex for queries; no direct driver calls scattered through code.
 - **Auto Migrate & Seed (dev)**: On startup in development, pending migrations are applied and baseline roles ensured.
 - **Database**: MySQL/MariaDB supported through `mysql2` driver.
@@ -19,7 +19,7 @@ Spam Shield is a Node.js application designed to provide a REST API for spam det
 
 The project is organized into several key directories:
 
-- `src`: Contains the main application code, including server setup, routes, controllers, services, models, and views.
+- `src`: Contains the main application code, including server setup, routes, controllers, services, models, and static front-end assets.
 - `test`: Contains unit tests for the API and services.
 - `docs`: Documentation for the API and other components.
 - `.env.sample`: Template for environment variables.
@@ -121,18 +121,18 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 ## Asset Bundling
 
-Assets are bundled with esbuild so pages can load one CSS and minimal JS files:
+Assets are bundled with esbuild so pages can load one CSS and minimal JS files. Static sources now live at the project root under `public/` (HTML, unbundled JS/CSS). Built bundles are written to `public/build/` (or `dist/build/` if you adopt a separate dist step):
 
 - Entry points:
-   - `src/assets/css/index.css` (Bootstrap, Bootstrap Icons, then your `styles.css`)
-   - `src/assets/js/index.js` (Bootstrap JS + your `public/js/theme.js` and `public/js/main.js`)
-   - Per-page bundle example: `src/public/js/dashboard.js` -> `src/public/build/dashboard.bundle.js`
+  - `src/assets/css/index.css` (Bootstrap, Bootstrap Icons, then your `styles.css`)
+  - `src/assets/js/index.js` (Bootstrap JS + your `public/js/theme.js` and `public/js/main.js`)
+  - Per-page bundle example: `src/public/js/dashboard.js` -> `src/public/build/dashboard.bundle.js`
 
-- Outputs (written to `src/public/build/`):
-   - `bundle.css` (+ font assets emitted automatically)
-   - `bundle.js`
-   - `dashboard.bundle.js` (used by the dashboard page)
-   - `manifest.json` (list of produced runtime assets)
+- Outputs (written to `public/build/`):
+  - `bundle.css` (+ font assets emitted automatically)
+  - `bundle.js`
+  - `dashboard.bundle.js` (used by the dashboard page)
+  - `manifest.json` (list of produced runtime assets)
 
 Commands:
 
@@ -144,29 +144,42 @@ npm run build
 npm run clean
 ```
 
-Development watch uses sourcemaps; production builds do not. Built assets are ignored by Git (`src/public/build/*`).
+Development watch uses sourcemaps; production builds do not. Built assets are ignored by Git (`public/build/*`).
 
-To add additional app JS/CSS, import them from the respective `src/assets/*/index` file. For page-specific JS, add a separate entry (like the dashboard example) and include it in a Pug `block scripts` on that page.
+To add additional app JS/CSS, import them from the respective `src/assets/*/index` file. For page-specific JS, add a separate entry (like the dashboard example) and reference the emitted bundle in your static HTML via a `<script src="/build/<name>.bundle.js" defer></script>` tag.
+
+## Email Templates
+
+Email templates are rendered with Handlebars:
+
+- Templates live in `src/email-templates/*.hbs` (e.g. `verify-email.hbs`).
+- Rendering and caching handled by `src/services/emailTemplates.js`.
+- To add a template:
+  1.  Create `src/email-templates/<name>.hbs`.
+  2.  Call `mailerService.sendTemplate(to, subject, '<name>', locals)`.
+  3.  Provide any required dynamic values in `locals`.
+
+Handlebars escapes values by default; if you need raw HTML, use the triple-stash syntax (`{{{rawHtml}}}`) cautiously.
 
 ## Running in Production
 
 1. Build assets:
 
-    ```bash
-    npm run build
-    ```
+   ```bash
+   npm run build
+   ```
 
-    This generates `bundle.css`, `bundle.js`, any page bundles (e.g. `dashboard.bundle.js`), and `manifest.json`.
+   This generates `bundle.css`, `bundle.js`, any page bundles (e.g. `dashboard.bundle.js`), and `manifest.json`.
 
 2. Start the app (production mode):
 
-    ```bash
-    npm start
-    ```
+   ```bash
+   npm start
+   ```
 
-    - The start script sets `NODE_ENV=production`.
-    - On startup, the server verifies:
-       - `src/public/build/bundle.css` and `bundle.js` exist
-       - `src/public/build/manifest.json` exists
-       - No `*.map` files are present in `src/public/build` (production fails if sourcemaps are detected)
-    - If any required artifact is missing, the server exits with instructions to run `npm run build`.
+   - The start script sets `NODE_ENV=production`.
+   - On startup, the server verifies:
+     - `src/public/build/bundle.css` and `bundle.js` exist
+     - `src/public/build/manifest.json` exists
+     - No `*.map` files are present in `src/public/build` (production fails if sourcemaps are detected)
+   - If any required artifact is missing, the server exits with instructions to run `npm run build`.

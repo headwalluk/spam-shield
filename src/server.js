@@ -10,14 +10,17 @@ const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
 
-console.log(`Starting Spam Shield application NODE_ENV=${process.env.NODE_ENV}`);
-
 // In production, ensure required built assets exist before starting the server
 function verifyProdAssets() {
   if (config.env !== 'production') {
     return;
   }
-  const buildDir = path.join(__dirname, 'public', 'build');
+  const projectRoot = path.join(__dirname, '..');
+  const candidateDirs = [
+    path.join(projectRoot, 'dist', 'build'),
+    path.join(projectRoot, 'public', 'build')
+  ];
+  const buildDir = candidateDirs.find((d) => fs.existsSync(d)) || candidateDirs[1];
   const required = ['bundle.css', 'bundle.js'];
   const missing = required.filter((f) => !fs.existsSync(path.join(buildDir, f)));
   if (missing.length) {

@@ -14,11 +14,11 @@ async function createApiKey(req, res) {
       return res.status(400).send('API key limit reached');
     }
 
-  const apiKey = nodeCrypto.randomBytes(16).toString('hex');
-  const hash = nodeCrypto.createHash('sha256').update(apiKey).digest('hex');
+    const apiKey = nodeCrypto.randomBytes(16).toString('hex');
+    const hash = nodeCrypto.createHash('sha256').update(apiKey).digest('hex');
 
     await apiKeyModel.create(userId, hash, label);
-    res.redirect('/dash');
+    res.status(201).json({ apiKey });
   } catch (error) {
     console.error('Error creating API key:', error);
     res.status(500).send('Error creating API key');
@@ -31,7 +31,7 @@ async function relabelApiKey(req, res) {
 
   try {
     await apiKeyModel.relabel(apiKeyId, label);
-    res.redirect('/dash');
+    res.redirect('/dash/api-keys');
   } catch (error) {
     console.error('Error relabeling API key:', error);
     res.status(500).send('Error relabeling API key');
@@ -43,7 +43,7 @@ async function deleteApiKey(req, res) {
 
   try {
     await apiKeyModel.revoke(apiKeyId);
-    res.redirect('/dash');
+    res.redirect('/dash/api-keys');
   } catch (error) {
     console.error('Error deleting API key:', error);
     res.status(500).send('Error deleting API key');

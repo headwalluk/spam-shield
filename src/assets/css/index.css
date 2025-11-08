@@ -1,5 +1,0 @@
-/* Bundle entry for application CSS */
-@import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap-icons/font/bootstrap-icons.css';
-/* Your overrides last to win specificity */
-@import '../../public/css/styles.css';

@@ -9,10 +9,13 @@ class ApiKeyModel {
     return db('api_keys').where({ key_hash }).whereNull('revoked_at').first();
   }
   async listByUser(user_id) {
-    return db('api_keys').where({ user_id }).select('*');
+    return db('api_keys').where({ user_id }).whereNull('revoked_at').select('*');
   }
   async revoke(id) {
     return db('api_keys').where({ id }).update({ revoked_at: db.fn.now() });
+  }
+  async relabel(id, label) {
+    return db('api_keys').where({ id }).update({ label });
   }
 }
 module.exports = new ApiKeyModel();

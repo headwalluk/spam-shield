@@ -12,7 +12,8 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./docs/swagger');
 const errorHandler = require('./middleware/errorHandler');
 const session = require('express-session');
-const KnexSessionStore = require('connect-session-knex')(session);
+// connect-session-knex v3 exports the class directly instead of a factory
+const { ConnectSessionKnexStore } = require('connect-session-knex');
 const config = require('./config');
 const passport = require('./middleware/passport');
 const db = require('./db/knex');
@@ -28,7 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Use DB-backed session store in non-test environments to persist sessions
 const useDbSessionStore = config.env !== 'test';
 const store = useDbSessionStore
-  ? new KnexSessionStore({
+  ? new ConnectSessionKnexStore({
       knex: db,
       tablename: 'web_sessions', // dedicated table for express-session store
       createtable: true,

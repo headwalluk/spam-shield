@@ -1,4 +1,5 @@
 const express = require('express');
+const keysRouter = require('./keys');
 const HomeController = require('../../controllers/homeController');
 const passport = require('../../middleware/passport');
 const config = require('../../config');
@@ -125,17 +126,12 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-// Auth guard
-function requireAuth(req, res, next) {
-  if (!req.user) {
-    return res.redirect('/login');
-  }
-  return next();
-}
+const { isAuthenticated } = require('../../middleware/auth');
 
-router.get('/dash', requireAuth, async (req, res) => {
+router.get('/dash', isAuthenticated, async (req, res) => {
   const roles = await authService.getUserRoles(req.user.id);
-  res.render('pages/dash', { title: 'Dashboard', user: req.user, roles });
+  const apiKeys = await require('../../models/apiKeyModel').listByUser(req.user.id);
+  res.render('pages/dash', { title: 'Dashboard', user: req.user, roles, apiKeys });
 });
 
 // Email verification landing page
@@ -209,5 +205,7 @@ router.post('/verify-email/resend', async (req, res) => {
 router.post('/logout', (req, res) => {
   req.logout(() => res.redirect('/'));
 });
+
+router.use('/keys', keysRouter);
 
 module.exports = router;

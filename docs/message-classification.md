@@ -34,6 +34,17 @@ The message classification component of the Spam Shield application is responsib
 
 To use the message classification feature, send a POST request to the `/api/messages/classify` endpoint with the message content. The system will return a spam score and classification result.
 
+## Classification Workflow
+
+The message classification process follows a structured workflow to ensure accurate and consistent spam detection.
+
+1.  **Message Reception**: The API receives a message, typically from a website contact form.
+2.  **Sanitization**: The message content is sanitized to remove any potentially harmful code or markup.
+3.  **Classifier Processing**: The sanitized message is passed through a series of classifiers, each designed to detect specific spam characteristics.
+4.  **Scoring**: Each classifier assigns a score to the message based on its analysis.
+5.  **Score Aggregation**: The scores from all classifiers are summed to produce a total score.
+6.  **Classification**: If the total score is 2.9 or greater, the message is classified as spam. Otherwise, it is classified as ham.
+
 ## Future Enhancements
 
 - Integration of machine learning models for improved accuracy.

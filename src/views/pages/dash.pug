@@ -5,20 +5,54 @@ block content
     .col-12
       h1.h3.mb-4 Dashboard
   .row
-    .col-lg-8
+    .col-lg-12
       .card.mb-4
         .card-body
           p.mb-0 Welcome, 
             strong #{user && user.email}
-      if roles && roles.length
-        .card
-          .card-header Your roles
-          .card-body
-            ul.mb-0
-              each r in roles
-                li= r.name || r
-    .col-lg-4
-      .card
+      .card.mt-4
+        .card-header API Keys
         .card-body
-          form(method='post' action='/logout')
-            button.btn.btn-outline-danger.w-100(type='submit') Logout
+          p You can have up to #{user.max_api_keys} API key(s).
+          if apiKeys && apiKeys.length
+            table.table
+              thead
+                tr
+                  th.text-nowrap Name
+                  th.w-100 API Key
+                  th.text-nowrap Actions
+              tbody
+                each key in apiKeys
+                  tr
+                    td.text-nowrap= key.label
+                    td
+                      i.bi.bi-clipboard.me-2(data-bs-toggle='tooltip' title='Click to copy' data-copy-text=key.key_hash style='cursor: pointer;')
+                      span.font-monospace(data-bs-toggle='tooltip' title='Click to copy' data-copy-text=key.key_hash style='cursor: pointer;')
+                        | #{key.key_hash.substring(0, 12)}...
+                    td.text-nowrap
+                      button.btn.btn-sm.btn-outline-primary(data-bs-toggle='modal' data-bs-target='#apiKeyModal' data-key-id=key.id data-key-label=key.label)
+                        i.bi.bi-pencil
+                      form(method='post' action='/keys/' + key.id + '/delete' style='display: inline; margin-left: 5px;' onsubmit="return confirm('Are you sure you want to delete this API key?');")
+                        button.btn.btn-sm.btn-outline-danger(type='submit')
+                          i.bi.bi-trash
+          if !apiKeys || apiKeys.length < user.max_api_keys
+            button.btn.btn-primary(type='button' data-bs-toggle='modal' data-bs-target='#apiKeyModal') Create API Key
+
+  // API Key Modal
+  .modal.fade#apiKeyModal(tabindex='-1' aria-labelledby='apiKeyModalLabel' aria-hidden='true')
+    .modal-dialog
+      .modal-content
+        .modal-header
+          h5.modal-title#apiKeyModalLabel Create API Key
+          button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+        .modal-body
+          form#apiKeyForm(method='post')
+            .mb-3
+              label.form-label(for='apiKeyNameInput') Name
+              input.form-control(type='text' id='apiKeyNameInput' name='label' required)
+            .modal-footer
+              button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Cancel
+              button.btn.btn-primary(type='submit') Save
+
+block scripts
+  script(src="/build/dashboard.bundle.js")

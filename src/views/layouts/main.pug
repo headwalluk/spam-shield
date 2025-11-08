@@ -6,18 +6,8 @@ html(lang="en" data-bs-theme="auto")
     title #{title || 'Spam Shield'}
     // App favicon
     link(rel="icon" type="image/webp" href="/headwall-icon.webp")
-    // Bootstrap CSS
-    link(
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    )
-    // Bootstrap Icons
-    link(
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-      rel="stylesheet"
-    )
-    // App overrides
-    link(rel="stylesheet", href="/css/styles.css")
+    // Bundled CSS (Bootstrap + Icons + App)
+    link(rel="stylesheet", href="/build/bundle.css")
   body
     // Navbar
     include ../partials/navbar
@@ -26,8 +16,6 @@ html(lang="en" data-bs-theme="auto")
       block content
     // Footer
     include ../partials/footer
-    // Bootstrap JS bundle
-    script(
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    )
-    script(src="/js/main.js")
+    // Bundled JS (Bootstrap + App)
+    script(src="/build/bundle.js")
+    block scripts

@@ -7,8 +7,52 @@ const knexConfig = require('../knexfile');
 const Knex = require('knex');
 const ensureDevSeed = require('./db/ensureDevSeed');
 const mysql = require('mysql2/promise');
+const fs = require('fs');
+const path = require('path');
 
 console.log(`Starting Spam Shield application NODE_ENV=${process.env.NODE_ENV}`);
+
+// In production, ensure required built assets exist before starting the server
+function verifyProdAssets() {
+  if (config.env !== 'production') {
+    return;
+  }
+  const buildDir = path.join(__dirname, 'public', 'build');
+  const required = ['bundle.css', 'bundle.js'];
+  const missing = required.filter((f) => !fs.existsSync(path.join(buildDir, f)));
+  if (missing.length) {
+    console.error(
+      `[production] Missing built assets: ${missing.join(
+        ', '
+      )}. Please run "npm run build" before starting the server.`
+    );
+    process.exit(1);
+  }
+  // Optional page-specific bundles (warn if absent)
+  const optional = ['dashboard.bundle.js'];
+  const missingOptional = optional.filter((f) => !fs.existsSync(path.join(buildDir, f)));
+  if (missingOptional.length) {
+    console.warn(
+      `[production] Optional bundles not found: ${missingOptional.join(
+        ', '
+      )}. Some pages may lack enhanced JS until built.`
+    );
+  }
+  // Ensure manifest exists
+  const manifestPath = path.join(buildDir, 'manifest.json');
+  if (!fs.existsSync(manifestPath)) {
+    console.error('[production] Asset manifest.json missing. Run "npm run build" first.');
+    process.exit(1);
+  }
+  // Fail if any source maps are present
+  const mapFiles = fs.readdirSync(buildDir).filter((f) => f.endsWith('.map'));
+  if (mapFiles.length) {
+    console.error(
+      `[production] Source map files detected (${mapFiles.join(', ')}). Production build must exclude maps. Re-run build without maps.`
+    );
+    process.exit(1);
+  }
+}
 
 async function ensureDatabaseExists() {
   const { host, user, password, database } = config.db;
@@ -26,6 +70,7 @@ async function ensureDatabaseExists() {
 }
 
 async function start() {
+  verifyProdAssets();
   // Auto-run migrations in development
   if (config.env === 'development') {
     // Attempt to create database if missing

@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.3.0] - 2025-11-08
+
+### Added
+
+- Front-end asset bundling pipeline using esbuild (CSS & JS) producing `bundle.css`, `bundle.js`, and page-specific `dashboard.bundle.js`.
+- Asset `manifest.json` emitted on build for production verification.
+- Production startup safety checks: required asset presence, manifest existence, and rejection of source maps.
+- Clean script (`npm run clean`) to remove stale build artifacts before rebuilding.
+- Dashboard enhancements: API key tooltip copy interactions and modal behavior with per-page JS bundle.
+
+### Changed
+
+- `npm start` now forces `NODE_ENV=production` to ensure secure cookie settings and disable dev behaviors.
+- Build script refactored to use esbuild context API for watch mode; disabled sourcemaps in production builds.
+- README expanded with clear development vs production workflow instructions and bundling documentation.
+- Converted global bootstrap usages to module imports (e.g. Tooltip) and removed reliance on CDN assets.
+- Server performs early exit if assets missing or source maps detected in production.
+
+### Fixed
+
+- Resolved TypeError from outdated `connect-session-knex` factory usage by switching to class export.
+- Eliminated global `bootstrap` reference error by bundling dashboard code and using module imports.
+- Lint issues (curly rule, no-unused-vars, crypto redeclaration) cleaned across build and server files.
+
+### Notes
+
+This release focuses on build optimization, production robustness, and front-end consolidation. Next steps may include content-hashed filenames, PurgeCSS/unused CSS reduction, asset manifest-driven template injection, and enhanced spam/IP scoring logic.
+
 ## [0.2.0] - 2025-11-07
 
 ### Added

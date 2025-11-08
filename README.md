@@ -51,14 +51,19 @@ The project is organized into several key directories:
 4. **Configure Environment Variables**:
    Copy `.env.sample` to `.env` and update the values as needed.
 
-5. **Run the Application**:
+5. **Run in Development**:
 
+   ```bash
+   # Starts the server with nodemon and watches assets (JS/CSS) with esbuild
+   npm run dev
    ```
-   npm start
-   ```
+
+   - Dev mode auto-runs pending DB migrations and seeds baseline data if needed.
+   - Asset sourcemaps are enabled while watching.
+   - Default port is `8080` unless overridden by `LISTEN_PORT` in `.env`.
 
 6. **Access the Web Interface**:
-   Open your browser and navigate to `http://localhost:3000` to access the web UI.
+   Open your browser and navigate to `http://localhost:8080` (or your configured port) to access the web UI.
 
 ## Database & Migrations
 
@@ -113,3 +118,55 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for notable changes. The `0.1.0` release ma
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for more details.
+
+## Asset Bundling
+
+Assets are bundled with esbuild so pages can load one CSS and minimal JS files:
+
+- Entry points:
+   - `src/assets/css/index.css` (Bootstrap, Bootstrap Icons, then your `styles.css`)
+   - `src/assets/js/index.js` (Bootstrap JS + your `public/js/theme.js` and `public/js/main.js`)
+   - Per-page bundle example: `src/public/js/dashboard.js` -> `src/public/build/dashboard.bundle.js`
+
+- Outputs (written to `src/public/build/`):
+   - `bundle.css` (+ font assets emitted automatically)
+   - `bundle.js`
+   - `dashboard.bundle.js` (used by the dashboard page)
+   - `manifest.json` (list of produced runtime assets)
+
+Commands:
+
+```bash
+# One-off production bundles (no sourcemaps)
+npm run build
+
+# Remove old bundles
+npm run clean
+```
+
+Development watch uses sourcemaps; production builds do not. Built assets are ignored by Git (`src/public/build/*`).
+
+To add additional app JS/CSS, import them from the respective `src/assets/*/index` file. For page-specific JS, add a separate entry (like the dashboard example) and include it in a Pug `block scripts` on that page.
+
+## Running in Production
+
+1. Build assets:
+
+    ```bash
+    npm run build
+    ```
+
+    This generates `bundle.css`, `bundle.js`, any page bundles (e.g. `dashboard.bundle.js`), and `manifest.json`.
+
+2. Start the app (production mode):
+
+    ```bash
+    npm start
+    ```
+
+    - The start script sets `NODE_ENV=production`.
+    - On startup, the server verifies:
+       - `src/public/build/bundle.css` and `bundle.js` exist
+       - `src/public/build/manifest.json` exists
+       - No `*.map` files are present in `src/public/build` (production fails if sourcemaps are detected)
+    - If any required artifact is missing, the server exits with instructions to run `npm run build`.

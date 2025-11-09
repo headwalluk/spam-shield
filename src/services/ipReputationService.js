@@ -1,27 +1,41 @@
-class IpReputationService {
-  constructor() {
-    this.ipReputationData = new Map(); // In-memory store for IP reputation data
-  }
+const ipEventModel = require('../models/ipEventModel');
+const countryModel = require('../models/countryModel');
 
-  // Method to add or update IP reputation
-  setReputation(ip, reputationScore) {
-    this.ipReputationData.set(ip, reputationScore);
-  }
+const AllowedEvents = new Set(['spam', 'failed_login', 'hard_block', 'abuse']);
 
-  // Method to get the reputation score of an IP
-  getReputation(ip) {
-    return this.ipReputationData.get(ip) || null; // Return null if IP not found
-  }
-
-  // Method to remove an IP from the reputation data
-  removeReputation(ip) {
-    this.ipReputationData.delete(ip);
-  }
-
-  // Method to get all IP reputations
-  getAllReputations() {
-    return Array.from(this.ipReputationData.entries());
-  }
+async function getIpReputation(address) {
+  const agg = await ipEventModel.aggregateReputation(address);
+  const code2 = (await ipEventModel.getLatestCountryForIp(address)) || '??';
+  const meta = await countryModel.getByCode2(code2);
+  return {
+    ...agg,
+    country: code2,
+    countryName: meta?.name || 'Unknown',
+    countryScore: meta?.score ?? 0
+  };
 }
 
-module.exports = new IpReputationService();
+async function logIpEvent(address, eventName, opts = {}) {
+  const name = String(eventName || '').toLowerCase();
+  if (!AllowedEvents.has(name)) {
+    const err = new Error('Invalid event');
+    err.status = 400;
+    throw err;
+  }
+  const flagMap = {
+    spam: { is_spam: true },
+    failed_login: { is_failed_login: true },
+    hard_block: { is_hard_block: true },
+    abuse: { is_abuse: true }
+  };
+  const flags = flagMap[name] || {};
+  await ipEventModel.logEvent({
+    address,
+    country: opts.country || '??',
+    caller: opts.caller || null,
+    flags
+  });
+  return getIpReputation(address);
+}
+
+module.exports = { getIpReputation, logIpEvent, AllowedEvents };

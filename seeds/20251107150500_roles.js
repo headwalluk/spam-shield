@@ -1,10 +1,18 @@
 exports.seed = async function (knex) {
-  // Deletes ALL existing entries
-  await knex('roles').del();
-  await knex('roles').insert([
+  // Idempotent seed: ensure required roles exist without deleting to avoid FK issues
+  const roles = [
     { id: 1, name: 'user' },
     { id: 2, name: 'administrator' }
-  ]);
-  // Reset auto increment to max id
-  await knex.raw('ALTER TABLE roles AUTO_INCREMENT = 3');
+  ];
+
+  for (const r of roles) {
+    const existing = await knex('roles').where({ id: r.id }).first();
+    if (existing) {
+      if (existing.name !== r.name) {
+        await knex('roles').where({ id: r.id }).update({ name: r.name });
+      }
+    } else {
+      await knex('roles').insert(r);
+    }
+  }
 };

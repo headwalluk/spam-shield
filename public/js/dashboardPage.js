@@ -1,81 +1,56 @@
-// Optional: verify Bootstrap JS readiness (for any dropdowns/tooltips later)
+// Optional: verify Bootstrap JS readiness
 if (typeof window.assertBootstrapReady === 'function') {
   window.assertBootstrapReady('dashboard');
 }
-// Dashboard page script
-function getJSON(url) {
-  return fetch(url, {
-    credentials: 'same-origin',
-    headers: { Accept: 'application/json' }
-  }).then(async (r) => {
-    if (!r.ok) {
-      const t = await r.text();
-      throw new Error(t || `HTTP ${r.status}`);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tilesContainer = document.getElementById('tiles-container');
+
+  const renderTiles = (tiles) => {
+    if (!tilesContainer) {
+      return;
     }
-    return r.json();
-  });
-}
-
-function postJSON(url, data = {}) {
-  return fetch(url, {
-    method: 'POST',
-    credentials: 'same-origin',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(async (r) => {
-    if (!r.ok) {
-      const t = await r.text();
-      throw new Error(t || `HTTP ${r.status}`);
+    tilesContainer.innerHTML = '';
+    if (!tiles || tiles.length === 0) {
+      tilesContainer.innerHTML = '<p class="text-muted">No items to display.</p>';
+      return;
     }
-    return r.json().catch(() => ({}));
-  });
-}
 
-async function loadUser() {
-  const userInfoEl = document.getElementById('userInfo');
-  try {
-    const me = await getJSON('/api/v3/auth/me');
-    userInfoEl.textContent = JSON.stringify(me, null, 2);
-    await loadApiKeys();
-  } catch {
-    userInfoEl.textContent = 'Not authenticated';
-  }
-}
+    tiles.forEach((tile) => {
+      const tileEl = document.createElement('div');
+      tileEl.className = 'col-lg-3 col-md-6 mb-4';
+      tileEl.innerHTML = `
+        <a href="${tile.url}" class="card text-decoration-none h-100">
+          <div class="card-body text-center d-flex flex-column justify-content-center">
+            <i class="${tile.iconClasses}"></i>
+            <h5 class="card-title mt-3">${tile.text}</h5>
+          </div>
+        </a>
+      `;
+      tilesContainer.appendChild(tileEl);
+    });
+  };
 
-async function loadApiKeys() {
-  // Reuse /me endpoint if it eventually returns keys; placeholder separate call otherwise
-  const listEl = document.getElementById('apiKeys');
-  listEl.innerHTML = '';
-  // Placeholder: real endpoint could be /api/v3/auth/keys
-  // For now show a stub; you can extend
-  const item = document.createElement('li');
-  item.className = 'list-group-item';
-  item.textContent = 'API keys listing TBD';
-  listEl.appendChild(item);
-}
-
-const issueBtn = document.getElementById('issueKeyBtn');
-if (issueBtn) {
-  issueBtn.addEventListener('click', async () => {
+  const loadDashboard = async () => {
     try {
-      await postJSON('/api/v3/auth/issue-key');
-      await loadUser();
-    } catch (e) {
-      alert(`Failed to issue key: ${e.message}`);
+      const response = await fetch('/api/v3/state');
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard state');
+      }
+      const { sitemap } = await response.json();
+      const dashboardConfig = sitemap.find((item) => item.url === '/dash');
+      if (dashboardConfig && dashboardConfig.tiles) {
+        renderTiles(dashboardConfig.tiles);
+      } else {
+        throw new Error('Dashboard configuration not found');
+      }
+    } catch (error) {
+      console.error('Error loading dashboard:', error);
+      if (tilesContainer) {
+        tilesContainer.innerHTML = '<p class="text-danger">Error loading dashboard content.</p>';
+      }
     }
-  });
-}
+  };
 
-const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      await postJSON('/api/v3/auth/logout');
-      window.location.href = '/html/login.html';
-    } catch {
-      alert('Logout failed');
-    }
-  });
-}
-
-loadUser();
+  loadDashboard();
+});

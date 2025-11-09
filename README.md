@@ -12,8 +12,7 @@ Spam Shield is a Node.js application designed to provide a REST API for spam det
 - **Unified Data Layer**: All models use Knex for queries; no direct driver calls scattered through code.
 - **Auto Migrate & Seed (dev)**: On startup in development, pending migrations are applied and baseline roles ensured.
 - **Database**: MySQL/MariaDB supported through `mysql2` driver.
-- **Tooling**: ESLint (flat config) enforcing brace style & quality rules; Prettier for formatting.
-- **Tooling**: ESLint (flat config) enforcing brace style & quality rules; Prettier for formatting; Swagger UI at `/docs/api` with raw spec at `/api-docs.json`.
+- **Tooling**: ESLint (flat config) enforcing brace style & quality rules; Prettier for formatting; Swagger UI at `/doc/api` with raw spec at `/api-docs.json` (alias `/doc/api-docs.json`).
 
 ## Project Structure
 
@@ -119,34 +118,45 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for notable changes. The `0.1.0` release ma
 
 This project is licensed under the MIT License. See the LICENSE file for more details.
 
-## Asset Bundling
+## Building front-end assets and HTML
 
-Assets are bundled with esbuild so pages can load one CSS and minimal JS files. Static sources now live at the project root under `public/` (HTML, unbundled JS/CSS). Built bundles are written to `public/build/` (or `dist/build/` if you adopt a separate dist step):
+We use esbuild for JS/CSS and a separate step to produce a minified `dist/` for production.
 
-- Entry points:
-  - `src/assets/css/index.css` (Bootstrap, Bootstrap Icons, then your `styles.css`)
-  - `src/assets/js/index.js` (Bootstrap JS + your `public/js/theme.js` and `public/js/main.js`)
-  - Per-page bundle example: `src/public/js/dashboard.js` -> `src/public/build/dashboard.bundle.js`
+- Sources live under `public/` (HTML, unbundled JS/CSS)
+- Bundled outputs go to `public/build/`
+- Production build copies bundles and minifies HTML into `dist/`
 
-- Outputs (written to `public/build/`):
-  - `bundle.css` (+ font assets emitted automatically)
-  - `bundle.js`
-  - `dashboard.bundle.js` (used by the dashboard page)
-  - `manifest.json` (list of produced runtime assets)
+Entry points (see `build.js`):
 
-Commands:
+- `public/css/index.css` → `public/build/bundle.css` (Bootstrap, Icons, then your styles)
+- `public/js/index.js` → `public/build/bundle.js` (single Bootstrap instance + shared UI)
+- Per‑page JS bundles, e.g. `public/js/dashboardPage.js` → `public/build/dashboard.bundle.js`
+
+Outputs:
+
+- `public/build/bundle.css`, `public/build/bundle.js`, page bundles, icon fonts, and `manifest.json`
+- `dist/` contains minified HTML (mirroring `public/`) and `dist/build/*`
+
+### Commands
 
 ```bash
-# One-off production bundles (no sourcemaps)
+# Clean all build artifacts (dist and public/build)
+npm run clean
+
+# Build JS/CSS bundles into public/build
 npm run build
 
-# Remove old bundles
-npm run clean
+# Full production build: bundles + minified HTML into dist/
+npm run build:dist
+
+# Optional: verify HTML script order (bundle before page bundles)
+npm run verify:html
 ```
 
-Development watch uses sourcemaps; production builds do not. Built assets are ignored by Git (`public/build/*`).
+Notes:
 
-To add additional app JS/CSS, import them from the respective `src/assets/*/index` file. For page-specific JS, add a separate entry (like the dashboard example) and reference the emitted bundle in your static HTML via a `<script src="/build/<name>.bundle.js" defer></script>` tag.
+- Dev watch (`npm run dev`) builds with sourcemaps and serves from `public/`.
+- Production (`npm start`) serves from `dist/` if present, else falls back to `public/`.
 
 ## Email Templates
 
@@ -163,13 +173,16 @@ Handlebars escapes values by default; if you need raw HTML, use the triple-stash
 
 ## Running in Production
 
-1. Build assets:
+1. Build production assets and HTML:
 
    ```bash
-   npm run build
+   npm run build:dist
    ```
 
-   This generates `bundle.css`, `bundle.js`, any page bundles (e.g. `dashboard.bundle.js`), and `manifest.json`.
+   This creates `dist/` with:
+   - Minified HTML (mirrors `public/` structure)
+   - `dist/build/*` optimized JS/CSS and fonts
+   - `dist/manifest.json` with simple content hashes
 
 2. Start the app (production mode):
 
@@ -177,9 +190,4 @@ Handlebars escapes values by default; if you need raw HTML, use the triple-stash
    npm start
    ```
 
-   - The start script sets `NODE_ENV=production`.
-   - On startup, the server verifies:
-     - `src/public/build/bundle.css` and `bundle.js` exist
-     - `src/public/build/manifest.json` exists
-     - No `*.map` files are present in `src/public/build` (production fails if sourcemaps are detected)
-   - If any required artifact is missing, the server exits with instructions to run `npm run build`.
+   The server serves static files from `dist/` when `NODE_ENV=production` and `dist/` exists; otherwise it serves `public/`.

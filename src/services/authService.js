@@ -33,6 +33,24 @@ class AuthService {
     return userModel.findById(user_id);
   }
 
+  async updateUser(userId, { email, password }) {
+    const updates = {};
+    if (email) {
+      const existing = await userModel.findByEmail(email);
+      if (existing && existing.id !== userId) {
+        throw new Error('EMAIL_EXISTS');
+      }
+      updates.email = email;
+    }
+    if (password) {
+      updates.password_hash = await bcrypt.hash(password, 10);
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await userModel.update(userId, updates);
+    }
+  }
+
   async verifyPassword(email, password) {
     const user = await userModel.findByEmail(email);
     if (!user) {

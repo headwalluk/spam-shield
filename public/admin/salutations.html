@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Salutations - Spam Shield</title>
+    <link rel="icon" type="image/webp" href="/headwall-icon.webp" />
+    <link rel="stylesheet" href="/build/bundle.css" />
+  </head>
+  <body>
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+    <header id="header-placeholder"></header>
+    <main class="container py-4">
+      <div class="d-flex align-items-center mb-3">
+        <h1 class="h4 m-0">Salutations</h1>
+        <div
+          id="loadingSpinner"
+          class="ms-2 spinner-border spinner-border-sm text-secondary d-none"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <button
+          class="btn btn-primary btn-sm ms-auto"
+          data-bs-toggle="modal"
+          data-bs-target="#salutationModal"
+        >
+          Create Salutation
+        </button>
+      </div>
+
+      <form id="searchForm" class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            id="salutationSearchInput"
+            class="form-control"
+            placeholder="Search phrase..."
+          />
+          <button class="btn btn-outline-secondary" type="submit">Search</button>
+        </div>
+      </form>
+
+      <div class="table-responsive small">
+        <table class="table table-striped align-middle">
+          <thead>
+            <tr>
+              <th>Phrase</th>
+              <th style="width: 140px">Score</th>
+              <th class="text-end" style="width: 140px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="salutationsTableBody">
+            <tr>
+              <td colspan="3" class="text-muted">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center" id="pagination"></ul>
+      </nav>
+    </main>
+
+    <div
+      class="modal fade"
+      id="salutationModal"
+      tabindex="-1"
+      aria-labelledby="salutationModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="salutationModalLabel">Create Salutation</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="salutationForm">
+              <input type="hidden" id="salutationIdInput" />
+              <div class="mb-3">
+                <label for="salutationPhraseInput" class="form-label">Phrase</label>
+                <input type="text" class="form-control" id="salutationPhraseInput" required />
+              </div>
+              <div class="mb-3">
+                <label for="salutationScoreInput" class="form-label">Score</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  class="form-control"
+                  id="salutationScoreInput"
+                  value="0"
+                />
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                  Close
+                </button>
+                <button type="submit" class="btn btn-primary">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer id="footer-placeholder"></footer>
+    <script src="/build/bundle.js"></script>
+    <script src="/build/admin-salutations.bundle.js"></script>
+  </body>
+</html>

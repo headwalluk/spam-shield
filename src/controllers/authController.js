@@ -11,6 +11,44 @@ class AuthController {
     res.json({ id: req.user.id, email: req.user.email, roles: req.user.roles });
   }
 
+  async updateMe(req, res) {
+    if (!req.user) {
+      return res.status(401).json({ error: 'UNAUTHENTICATED' });
+    }
+
+    const { email, password } = req.body;
+    const updates = {};
+
+    if (email && email !== req.user.email) {
+      updates.email = email;
+    }
+
+    if (password) {
+      const { validatePasswordStrength } = require('../utils/validators');
+      const strength = validatePasswordStrength(password, config.auth.passwordPolicy);
+      if (!strength.valid) {
+        return res.status(400).json({ error: 'WEAK_PASSWORD', details: strength.errors });
+      }
+      updates.password = password;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(200).json({ message: 'NO_CHANGES' });
+    }
+
+    try {
+      await authService.updateUser(req.user.id, updates);
+      const updatedUser = await require('../models/userModel').findById(req.user.id);
+      res.json({ id: updatedUser.id, email: updatedUser.email });
+    } catch (e) {
+      if (e.message === 'EMAIL_EXISTS') {
+        return res.status(409).json({ error: 'EMAIL_EXISTS' });
+      }
+      console.error('Update user failed:', e);
+      res.status(500).json({ error: 'UPDATE_FAILED' });
+    }
+  }
+
   async register(req, res) {
     if (!config.auth.enableRegistration) {
       return res.status(403).json({ error: 'REGISTRATION_DISABLED' });

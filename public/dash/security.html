@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Security - Spam Shield</title>
+    <link rel="icon" type="image/webp" href="/headwall-icon.webp" />
+    <link rel="stylesheet" href="/build/bundle.css" />
+  </head>
+  <body>
+    <!-- Toast container for notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <header id="header-placeholder"></header>
+    <main class="container py-4">
+      <h1 class="h4 mb-3">Security</h1>
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Update Profile</h5>
+              <form id="security-form">
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email address</label>
+                  <input type="email" class="form-control" id="email" required />
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">New Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    aria-describedby="passwordHelp"
+                  />
+                  <div id="passwordHelp" class="form-text">
+                    Leave blank to keep your current password.
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer id="footer-placeholder"></footer>
+    <script src="/build/bundle.js"></script>
+    <script src="/build/security.bundle.js"></script>
+  </body>
+</html>

@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.5.0] - 2025-11-09
+
+### Added
+
+- New lookup list: Salutations
+  - Migration creating `salutations` table (phrase unique, score default 0)
+  - Model with in-memory cache, server-side pagination, and CRUD
+  - API: `GET/POST/PUT/DELETE /api/v3/salutations` (admin-only)
+  - Admin UI at `/admin/salutations` with search, modal editing, and condensed pagination
+  - Seed with several common salutations (score 0)
+- Admin state tile linking to the new Salutations page
+
+### Changed
+
+- Bad Phrases admin list moved to server-side pagination with search windowing for scalability
+- Classification endpoint unified at `POST /api/v3/messages` (replacing legacy `/classify`) with:
+  - Role restriction: only users with role `user` may invoke
+  - Minimal response `{ result, timing }` to reduce PII exposure
+  - Support for hints (forceToSpam, countryRestrictions, scriptRestriction)
+- Countries API: `GET /api/v3/countries/{code2}` now returns absolute `flagUrl`; admin editing retained under `/api/v3/countries`
+- API navigation state at `GET /api/v3/state` updated with Admin tiles (Users, Countries, Bad Phrases, Salutations)
+
+### Removed
+
+- Legacy `/api/v3/classify` route in favor of `POST /api/v3/messages`
+
+### Docs
+
+- Expanded Swagger/OpenAPI JSDoc across endpoints (state, api-keys, salutations, bad-phrases, messages, auth, roles, user-statuses, countries)
+
 ## [0.4.0] - 2025-11-08
 
 - Major refactor. Got rid of Pug and replaced it with static HTML assets and mor ein-browser rendering.

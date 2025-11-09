@@ -53,6 +53,46 @@ async function run() {
         }
       },
       {
+        name: 'admin-dashboard-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/admin-dashboard.js'],
+          outfile: 'public/build/admin-dashboard.bundle.js'
+        }
+      },
+      {
+        name: 'admin-countries-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/admin-countries.js'],
+          outfile: 'public/build/admin-countries.bundle.js'
+        }
+      },
+      {
+        name: 'admin-bad-phrases-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/admin-bad-phrases.js'],
+          outfile: 'public/build/admin-bad-phrases.bundle.js'
+        }
+      },
+      {
+        name: 'admin-salutations-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/admin-salutations.js'],
+          outfile: 'public/build/admin-salutations.bundle.js'
+        }
+      },
+      {
+        name: 'security-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/security.js'],
+          outfile: 'public/build/security.bundle.js'
+        }
+      },
+      {
         name: 'register-js',
         options: {
           ...sharedConfig,

@@ -64,14 +64,15 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Static files: prefer /dist if present, else /public (both at project root)
+// Static files: in production serve /dist if present; otherwise serve /public
 const projectRoot = path.join(__dirname, '..');
 const distDir = path.join(projectRoot, 'dist');
 const publicDir = path.join(projectRoot, 'public');
-if (fs.existsSync(distDir)) {
+if (process.env.NODE_ENV === 'production' && fs.existsSync(distDir)) {
   app.use(express.static(distDir));
+} else {
+  app.use(express.static(publicDir));
 }
-app.use(express.static(publicDir));
 
 // Swagger API docs (UI)
 // Primary path: /doc/api

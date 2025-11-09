@@ -1,4 +1,5 @@
 const messageModel = require('../models/messageModel');
+const classificationService = require('../services/classificationService');
 
 class MessagesController {
   constructor() {
@@ -22,20 +23,27 @@ class MessagesController {
 
   async createMessage(req, res) {
     try {
-      const { text } = req.body;
-      if (!text || typeof text !== 'string') {
-        return res.status(400).json({ error: 'text is required' });
-      }
-      if (this._useMemory) {
-        const id = this._idCounter++;
-        this._store.set(id, { id, content: text, created_at: new Date(), updated_at: null });
-        return res.status(201).json({ id, text });
-      } else {
-        const id = await this._model.createMessage({ content: text });
-        return res.status(201).json({ id, text });
-      }
-    } catch {
-      res.status(500).json({ error: 'Failed to create message' });
+      // Support optional X-Caller header
+      const caller = req.header('X-Caller') || null;
+      const body = req.body || {};
+      // Sanitize inputs with defaults as requested
+      const ip = typeof body.ip === 'string' ? body.ip : '';
+      const message = typeof body.message === 'string' ? body.message : '';
+      const fields =
+        body && typeof body.fields === 'object' && body.fields !== null ? body.fields : {};
+      const hints = body && typeof body.hints === 'object' && body.hints !== null ? body.hints : {};
+
+      // Always use the classification pipeline; bypass in-memory scaffold for consistency
+      const data = await classificationService.classifyAndLog({
+        ip,
+        fields,
+        message,
+        hints,
+        caller
+      });
+      return res.status(201).json(data);
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to classify message', detail: err.message });
     }
   }
 

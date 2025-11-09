@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         usersTableBody.innerHTML = '';
       }
       const params = new URLSearchParams({ page, limit: 10, email });
-      const response = await fetch(`/api/v3/admin/users?${params}`);
+      const response = await fetch(`/api/v3/users?${params}`);
       if (!response.ok) {
         throw new Error('Failed to fetch users');
       }
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const populateStatuses = async () => {
     try {
-      const response = await fetch('/api/v3/admin/user-statuses');
+      const response = await fetch('/api/v3/user-statuses');
       if (response.ok) {
         const statuses = await response.json();
         statusInput.innerHTML = ''; // Clear previous options
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const populateRoles = async () => {
     try {
-      const response = await fetch('/api/v3/admin/roles');
+      const response = await fetch('/api/v3/roles');
       if (response.ok) {
         allRoles = await response.json();
       }
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
       modalTitle.textContent = 'Edit User';
       userIdInput.value = userId;
       try {
-        const response = await fetch(`/api/v3/admin/users/${userId}`);
+        const response = await fetch(`/api/v3/users/${userId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch user details');
         }
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
   userForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const id = userIdInput.value;
-    const url = id ? `/api/v3/admin/users/${id}` : '/api/v3/admin/users';
+    const url = id ? `/api/v3/users/${id}` : '/api/v3/users';
     const method = id ? 'PUT' : 'POST';
 
     const selectedRoles = Array.from(
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (confirm('Are you sure you want to delete this user?')) {
         const userId = button.getAttribute('data-user-id');
         try {
-          const response = await fetch(`/api/v3/admin/users/${userId}`, { method: 'DELETE' });
+          const response = await fetch(`/api/v3/users/${userId}`, { method: 'DELETE' });
           if (response.ok) {
             showToast('User deleted successfully.');
             fetchUsers(currentPage, currentSearchTerm);

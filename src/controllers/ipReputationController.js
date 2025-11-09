@@ -1,43 +1,27 @@
-class IpReputationController {
-  constructor(ipReputationService) {
-    this.ipReputationService = ipReputationService;
-    this.getIpReputation = this.getReputation.bind(this);
-    this.logIpActivity = this.logActivity.bind(this);
-    this.resetIpActivity = this.resetActivity.bind(this);
-  }
+const service = require('../services/ipReputationService');
 
-  async getReputation(req, res) {
-    const { ip } = req.params;
-    try {
-      const reputationData = await this.ipReputationService.getReputation(ip);
-      if (!reputationData) {
-        return res.status(404).json({ message: 'IP address not found' });
-      }
-      res.json(reputationData);
-    } catch (error) {
-      res.status(500).json({ message: 'Error retrieving IP reputation', error: error.message });
-    }
-  }
-
-  async logActivity(req, res) {
-    const { ip } = req.body;
-    try {
-      await this.ipReputationService.logActivity(ip);
-      res.status(200).json({ message: 'IP activity logged successfully' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error logging IP activity', error: error.message });
-    }
-  }
-
-  async resetActivity(req, res) {
-    const { ip } = req.params;
-    try {
-      await this.ipReputationService.resetActivity(ip);
-      res.status(200).json({ message: 'IP activity reset successfully' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error resetting IP activity', error: error.message });
-    }
+async function getIp(req, res) {
+  const { ip } = req.params;
+  try {
+    const data = await service.getIpReputation(ip);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving IP reputation', error: error.message });
   }
 }
 
-module.exports = IpReputationController;
+async function postEvent(req, res) {
+  const { ip } = req.params;
+  const { event, country, caller } = req.body || {};
+  try {
+    const data = await service.logIpEvent(ip, event, { country, caller });
+    res.status(201).json(data);
+  } catch (error) {
+    if (error.status === 400) {
+      return res.status(400).json({ error: 'invalid event' });
+    }
+    res.status(500).json({ message: 'Error logging IP event', error: error.message });
+  }
+}
+
+module.exports = { getIp, postEvent };

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Countries - Spam Shield</title>
+    <link rel="icon" type="image/webp" href="/headwall-icon.webp" />
+    <link rel="stylesheet" href="/build/bundle.css" />
+  </head>
+  <body>
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+    <header id="header-placeholder"></header>
+    <main class="container py-4">
+      <div class="d-flex align-items-center mb-3">
+        <h1 class="h4 m-0">Countries</h1>
+        <div
+          id="loadingSpinner"
+          class="ms-2 spinner-border spinner-border-sm text-secondary d-none"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="ms-auto"></div>
+      </div>
+
+      <!-- Filter/Search -->
+      <form id="filterForm" class="row g-2 mb-3">
+        <div class="col-sm-4">
+          <input
+            type="text"
+            id="searchInput"
+            class="form-control"
+            placeholder="Search name or code..."
+          />
+        </div>
+        <div class="col-sm-3">
+          <select id="scoreFilter" class="form-select">
+            <option value="">All Scores</option>
+            <option value="neg">Negative (&lt;0)</option>
+            <option value="zero">Zero (=0)</option>
+            <option value="pos">Positive (&gt;0)</option>
+          </select>
+        </div>
+        <div class="col-sm-2">
+          <button class="btn btn-outline-secondary w-100" type="submit">Filter</button>
+        </div>
+        <div class="col-sm-3 text-sm-end">
+          <small class="text-muted" id="countSummary"></small>
+        </div>
+      </form>
+
+      <div class="table-responsive small">
+        <table class="table table-striped align-middle" id="countriesTable">
+          <thead>
+            <tr>
+              <th style="width: 38px"></th>
+              <th style="width: 120px">Code2</th>
+              <th style="width: 120px">Code3</th>
+              <th>Name</th>
+              <th style="width: 120px">Score</th>
+              <th class="text-end" style="width: 140px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="countriesTbody">
+            <tr>
+              <td colspan="6" class="text-muted">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+    <footer id="footer-placeholder"></footer>
+    <script src="/build/bundle.js"></script>
+    <script src="/build/admin-countries.bundle.js"></script>
+  </body>
+</html>

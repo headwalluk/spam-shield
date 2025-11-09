@@ -26,7 +26,9 @@ function validateForm(form) {
 const loadingSpinner = document.getElementById('loadingSpinner');
 
 const showSpinner = () => {
-  if (loadingSpinner) loadingSpinner.classList.remove('d-none', 'fade');
+  if (loadingSpinner) {
+    loadingSpinner.classList.remove('d-none', 'fade');
+  }
 };
 
 const hideSpinner = () => {

@@ -1,21 +1,3 @@
-const mongoose = require('mongoose');
-
-const ipActivitySchema = new mongoose.Schema({
-  ipAddress: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  activity: {
-    type: [String],
-    default: []
-  },
-  lastActive: {
-    type: Date,
-    default: Date.now
-  }
-});
-
-const IpActivity = mongoose.model('IpActivity', ipActivitySchema);
-
-module.exports = IpActivity;
+// Deprecated: This project uses MariaDB via Knex; Mongo/Mongoose is not used.
+// Any remaining imports of this module indicate stale references.
+throw new Error('ipActivityModel.js is deprecated. Use ipEventModel (Knex/MariaDB) instead.');

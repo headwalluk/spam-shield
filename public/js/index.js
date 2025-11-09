@@ -72,7 +72,8 @@ async function renderNav() {
       if (state.isAuthenticated === true) {
         const logoutBtn = document.createElement('button');
         logoutBtn.type = 'button';
-        logoutBtn.textContent = 'Logout';
+        // logoutBtn.textContent = 'Logout';
+        logoutBtn.innerHTML += '<i class="bi bi-box-arrow-right"></i>';
         logoutBtn.className = 'btn btn-outline-secondary btn-sm';
         logoutBtn.addEventListener('click', async () => {
           try {

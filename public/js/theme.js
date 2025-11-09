@@ -74,9 +74,6 @@
     });
   }
 
-  // Initialize on DOM ready
-  window.addEventListener('DOMContentLoaded', initThemeControls);
-
   // Expose a global initializer so late-inserted controls (e.g. injected header)
   // can be wired up after they are added to the DOM.
   window.ThemeSwitcherInit = initThemeControls;

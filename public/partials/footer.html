@@ -1,4 +1,4 @@
-<div class="container py-4 border-top text-muted">
+<div class="container py-4 border-top text-muted d-flex align-items-center gap-3 flex-wrap">
   <a
     class="d-inline-flex align-items-center gap-1"
     href="https://github.com/headwalluk/spam-shield"
@@ -8,4 +8,53 @@
     <i class="bi bi-github"></i>
     <span>GitHub</span>
   </a>
+  <a class="d-inline-flex align-items-center gap-1" href="/doc/api">
+    <i class="bi bi-journal-code"></i>
+    <span>Docs</span>
+  </a>
+  <div class="ms-auto dropup">
+    <button
+      id="themeDropdown"
+      class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-1"
+      type="button"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+      title="Theme"
+    >
+      <i class="bi bi-circle-half"></i>
+      <span class="visually-hidden">Theme</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdown">
+      <li>
+        <button
+          type="button"
+          class="dropdown-item d-flex align-items-center gap-2"
+          data-theme="light"
+        >
+          <i class="bi bi-sun-fill"></i>
+          <span>Light</span>
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="dropdown-item d-flex align-items-center gap-2"
+          data-theme="dark"
+        >
+          <i class="bi bi-moon-stars-fill"></i>
+          <span>Dark</span>
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
+          class="dropdown-item d-flex align-items-center gap-2"
+          data-theme="auto"
+        >
+          <i class="bi bi-circle-half"></i>
+          <span>Auto</span>
+        </button>
+      </li>
+    </ul>
+  </div>
 </div>

@@ -1,5 +1,5 @@
-// Load env early so config sees .env
-require('dotenv').config();
+// Load env early so config sees .env (quiet to suppress noisy tips)
+require('dotenv').config({ quiet: true });
 const express = require('express');
 const app = require('./app');
 const config = require('./config');

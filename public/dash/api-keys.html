@@ -12,12 +12,106 @@
     <main class="container py-4">
       <div class="d-flex align-items-center mb-3">
         <h1 class="h4 m-0">API Keys</h1>
-        <button id="issueKeyBtn" class="btn btn-primary btn-sm ms-auto">Create API Key</button>
+        <div class="ms-auto">
+          <button id="refreshKeysBtn" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <button id="createKeyBtn" class="btn btn-primary btn-sm">Create API Key</button>
+        </div>
       </div>
-      <ul id="apiKeys" class="list-group mb-4"></ul>
+
+      <div id="loadingSpinner" class="text-center my-5" style="display: none">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <table id="apiKeysTable" class="table table-striped" style="display: none">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- API keys will be inserted here -->
+        </tbody>
+      </table>
       <p class="text-muted small">Manage keys used to authenticate against the Spam Shield API.</p>
     </main>
     <footer id="footer-placeholder"></footer>
+
+    <!-- Edit/Create Key Modal -->
+    <div
+      class="modal fade"
+      id="keyModal"
+      tabindex="-1"
+      aria-labelledby="keyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="keyModalLabel">Create API Key</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="keyForm">
+              <input type="hidden" id="keyId" />
+              <div class="mb-3">
+                <label for="keyLabel" class="form-label">Label</label>
+                <input type="text" class="form-control" id="keyLabel" required />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="saveKeyBtn">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show New Key Modal -->
+    <div
+      class="modal fade"
+      id="showKeyModal"
+      tabindex="-1"
+      aria-labelledby="showKeyModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="showKeyModalLabel">New API Key</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="fw-bold text-danger">
+              This is your only chance to copy the API key. For security reasons, it will not be
+              shown again.
+            </p>
+            <div class="input-group">
+              <input type="text" id="newApiKey" class="form-control" readonly />
+              <button class="btn btn-outline-secondary" type="button" id="copyKeyBtn">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="/build/bundle.js"></script>
     <script src="/build/api-keys.bundle.js"></script>
   </body>

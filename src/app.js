@@ -74,9 +74,13 @@ if (fs.existsSync(distDir)) {
 app.use(express.static(publicDir));
 
 // Swagger API docs (UI)
-app.use('/docs/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-// Raw spec JSON
+// Primary path: /doc/api
+app.use('/doc/api', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Raw spec JSON (keep stable URL and add new alias)
 app.get('/api-docs.json', (req, res) => {
+  res.json(swaggerSpec);
+});
+app.get('/doc/api-docs.json', (req, res) => {
   res.json(swaggerSpec);
 });
 

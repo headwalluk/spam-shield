@@ -6,7 +6,7 @@ const {
   updateApiKey,
   deleteApiKey
 } = require('../../../controllers/apiKeyApiController');
-const passport = require('../../../middleware/passport');
+const { isAuthenticated } = require('../../../middleware/auth');
 
 function isUser(req, res, next) {
   if (req.user && req.user.roles.includes('user')) {
@@ -15,7 +15,7 @@ function isUser(req, res, next) {
   res.status(403).send('Forbidden D');
 }
 
-router.use(passport.authenticate('headerapikey', { session: false }), isUser);
+router.use(isAuthenticated, isUser);
 
 router.get('/', getApiKeys);
 router.post('/', createApiKey);

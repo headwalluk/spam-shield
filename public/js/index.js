@@ -1,7 +1,28 @@
 // Bundle entry for application JS (browser)
 // - Includes Bootstrap JS (requires Popper)
 // - Includes theme + main, plus dynamic header/footer + nav actions
-import 'bootstrap';
+// Import Bootstrap ESM and expose a single global to avoid multiple instances across page bundles
+import * as bootstrap from 'bootstrap';
+if (!window.bootstrap) {
+  window.bootstrap = bootstrap;
+}
+
+// Expose a tiny assertion helper so page bundles can verify ordering
+if (!window.assertBootstrapReady) {
+  window.assertBootstrapReady = function (context = 'page') {
+    const ok = !!(window.bootstrap && (window.bootstrap.Dropdown || window.bootstrap.Modal));
+    if (!ok) {
+      if (!window.__bootstrapWarned) {
+        console.warn(
+          `[bootstrap] Bootstrap JS not initialized. Ensure /build/bundle.js loads before the ${context} bundle.`
+        );
+        window.__bootstrapWarned = true;
+      }
+      return false;
+    }
+    return true;
+  };
+}
 import './theme.js';
 
 async function inject(id, url) {
@@ -60,7 +81,7 @@ async function renderNav() {
               credentials: 'same-origin',
               headers: { 'Content-Type': 'application/json' }
             });
-          } catch (_e) {
+          } catch {
             // ignore network errors and still redirect
           } finally {
             // Redirect to front page
@@ -76,13 +97,30 @@ async function renderNav() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  await Promise.all([
-    inject('header-placeholder', '/partials/header.html'),
-    inject('footer-placeholder', '/partials/footer.html')
-  ]);
-  // Initialize theme controls after header has been injected
-  if (typeof window.ThemeSwitcherInit === 'function') {
-    window.ThemeSwitcherInit();
+  // Inject partials first
+  await inject('header-placeholder', '/partials/header.html');
+  await inject('footer-placeholder', '/partials/footer.html');
+
+  // Manually initialize Bootstrap components within the injected footer
+  const footer = document.getElementById('footer-placeholder');
+  if (footer) {
+    // console.log( `Loaded footer`);
+    /**
+     * REMOVED: Not needed in Bootstrap 5
+    // Initialize dropdowns (now dropups in the footer)
+    const dropdownElementList = [].slice.call(
+      footer.querySelectorAll('[data-bs-toggle="dropdown"]')
+    );
+    dropdownElementList.map(function (dropdownToggleEl) {
+      return new window.bootstrap.Dropdown(dropdownToggleEl);
+    });
+     */
+
+    // Initialize theme controls
+    if (typeof window.ThemeSwitcherInit === 'function') {
+      window.ThemeSwitcherInit();
+    }
   }
+
   await renderNav();
 });

@@ -45,6 +45,10 @@ router.get('/reset-password', (_req, res) => {
   res.sendFile(path.join(getStaticRoot(), 'reset-password.html'));
 });
 
+router.get('/doc', (_req, res) => {
+  res.sendFile(path.join(getStaticRoot(), 'doc', 'index.html'));
+});
+
 // Placeholder until verify-email page exists
 router.get('/verify-email', (_req, res) => res.redirect('/'));
 
@@ -62,6 +66,7 @@ router.post('/logout', (req, res) => {
 // Back-compat for new pages (in case .html variants were bookmarked earlier)
 router.get('/register.html', (_req, res) => res.redirect(301, '/register'));
 router.get('/reset-password.html', (_req, res) => res.redirect(301, '/reset-password'));
+router.get('/doc/index.html', (_req, res) => res.redirect(301, '/doc'));
 
 // Retain existing nested router for key management actions (API-style POSTs)
 router.use('/keys', keysRouter);

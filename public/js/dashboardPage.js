@@ -1,3 +1,7 @@
+// Optional: verify Bootstrap JS readiness (for any dropdowns/tooltips later)
+if (typeof window.assertBootstrapReady === 'function') {
+  window.assertBootstrapReady('dashboard');
+}
 // Dashboard page script
 function getJSON(url) {
   return fetch(url, {
@@ -33,7 +37,7 @@ async function loadUser() {
     const me = await getJSON('/api/v3/auth/me');
     userInfoEl.textContent = JSON.stringify(me, null, 2);
     await loadApiKeys();
-  } catch (e) {
+  } catch {
     userInfoEl.textContent = 'Not authenticated';
   }
 }
@@ -68,7 +72,7 @@ if (logoutBtn) {
     try {
       await postJSON('/api/v3/auth/logout');
       window.location.href = '/html/login.html';
-    } catch (e) {
+    } catch {
       alert('Logout failed');
     }
   });

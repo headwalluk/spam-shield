@@ -1,3 +1,7 @@
+// Optional: verify Bootstrap JS readiness early
+if (typeof window.assertBootstrapReady === 'function') {
+  window.assertBootstrapReady('reset-password');
+}
 // Reset password page logic
 
 function setStatus(el, type, message) {
@@ -19,6 +23,21 @@ function validateForm(form) {
   return form.checkValidity();
 }
 
+const loadingSpinner = document.getElementById('loadingSpinner');
+
+const showSpinner = () => {
+  if (loadingSpinner) loadingSpinner.classList.remove('d-none', 'fade');
+};
+
+const hideSpinner = () => {
+  if (loadingSpinner) {
+    loadingSpinner.classList.add('fade');
+    setTimeout(() => {
+      loadingSpinner.classList.add('d-none');
+    }, 150); // Match Bootstrap's fade duration
+  }
+};
+
 async function submitRequest(e) {
   e.preventDefault();
   const form = e.currentTarget;
@@ -28,6 +47,7 @@ async function submitRequest(e) {
     return;
   }
   const data = Object.fromEntries(new FormData(form));
+  showSpinner();
   try {
     const res = await fetch('/api/v3/auth/reset-password', {
       method: 'POST',
@@ -47,8 +67,10 @@ async function submitRequest(e) {
       return;
     }
     setStatus(resultEl, 'danger', 'Reset request failed.');
-  } catch (err) {
+  } catch {
     setStatus(resultEl, 'danger', 'Network error. Please try again.');
+  } finally {
+    hideSpinner();
   }
 }
 
@@ -61,6 +83,7 @@ async function submitConsume(e) {
     return;
   }
   const data = Object.fromEntries(new FormData(form));
+  showSpinner();
   try {
     const res = await fetch('/api/v3/auth/reset-password/consume', {
       method: 'POST',
@@ -80,8 +103,10 @@ async function submitConsume(e) {
       return;
     }
     setStatus(resultEl, 'danger', 'Reset failed. Please try again.');
-  } catch (err) {
+  } catch {
     setStatus(resultEl, 'danger', 'Network error. Please try again.');
+  } finally {
+    hideSpinner();
   }
 }
 

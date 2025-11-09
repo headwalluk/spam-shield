@@ -1,97 +1,163 @@
+// Use global bootstrap provided by main bundle instead of importing again
+if (typeof window.assertBootstrapReady === 'function') {
+  window.assertBootstrapReady('api-keys');
+}
+const Modal = window.bootstrap ? window.bootstrap.Modal : null;
+
 document.addEventListener('DOMContentLoaded', () => {
-  // API Key modal logic
-  const apiKeyModal = document.getElementById('apiKeyModal');
-  if (apiKeyModal) {
-    const modalTitle = apiKeyModal.querySelector('.modal-title');
-    const form = apiKeyModal.querySelector('#apiKeyForm');
-    const input = apiKeyModal.querySelector('#apiKeyNameInput');
+  const createKeyBtn = document.getElementById('createKeyBtn');
+  const refreshKeysBtn = document.getElementById('refreshKeysBtn');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const apiKeysTable = document.getElementById('apiKeysTable');
+  const tableBody = apiKeysTable.querySelector('tbody');
 
-    apiKeyModal.addEventListener('show.bs.modal', (event) => {
-      const button = event.relatedTarget;
-      const keyId = button.getAttribute('data-key-id');
-      const keyLabel = button.getAttribute('data-key-label');
+  // Modals
+  const keyModalEl = document.getElementById('keyModal');
+  const keyModal = Modal ? Modal.getOrCreateInstance(keyModalEl) : null;
+  const keyModalLabel = document.getElementById('keyModalLabel');
+  const keyIdInput = document.getElementById('keyId');
+  const keyLabelInput = document.getElementById('keyLabel');
+  const saveKeyBtn = document.getElementById('saveKeyBtn');
 
-      if (keyId) {
-        // Editing an existing key
-        modalTitle.textContent = 'Edit API Key';
-        form.action = `/keys/${keyId}/relabel`;
-        input.value = keyLabel;
+  const showKeyModalEl = document.getElementById('showKeyModal');
+  const showKeyModal = Modal ? Modal.getOrCreateInstance(showKeyModalEl) : null;
+  const newApiKeyInput = document.getElementById('newApiKey');
+  const copyKeyBtn = document.getElementById('copyKeyBtn');
+
+  const fetchKeys = async () => {
+    loadingSpinner.style.display = 'block';
+    apiKeysTable.style.display = 'none';
+    try {
+      const response = await fetch('/api/v3/api-keys');
+      if (!response.ok) {
+        throw new Error('Failed to fetch API keys');
+      }
+      const keys = await response.json();
+      renderTable(keys);
+    } catch (error) {
+      console.error(error);
+      tableBody.innerHTML = `<tr><td colspan="2" class="text-center text-danger">Error loading API keys.</td></tr>`;
+    } finally {
+      loadingSpinner.style.display = 'none';
+      apiKeysTable.style.display = 'table';
+    }
+  };
+
+  const renderTable = (keys) => {
+    tableBody.innerHTML = '';
+    if (keys.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="2" class="text-center">No API keys found.</td></tr>`;
+      return;
+    }
+    keys.forEach((key) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${key.label}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-secondary edit-btn" data-id="${key.id}" data-label="${key.label}">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${key.id}">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  };
+
+  const openKeyModal = (id = null, label = '') => {
+    keyIdInput.value = id || '';
+    keyLabelInput.value = label;
+    keyModalLabel.textContent = id ? 'Edit API Key' : 'Create API Key';
+    if (keyModal) {
+      keyModal.show();
+    }
+  };
+
+  const saveKey = async () => {
+    const id = keyIdInput.value;
+    const label = keyLabelInput.value;
+    const url = id ? `/api/v3/api-keys/${id}` : '/api/v3/api-keys';
+    const method = id ? 'PUT' : 'POST';
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save key');
+      }
+
+      if (keyModal) {
+        keyModal.hide();
+      }
+
+      if (method === 'POST') {
+        const { apiKey } = await response.json();
+        newApiKeyInput.value = apiKey;
+        if (showKeyModal) {
+          showKeyModal.show();
+        }
       } else {
-        // Creating a new key
-        modalTitle.textContent = 'Create API Key';
-        form.action = '/keys';
-        input.value = '';
+        await fetchKeys();
       }
-    });
+    } catch (error) {
+      console.error(error);
+      alert('Error saving API key.');
+    }
+  };
 
-    apiKeyModal.addEventListener('shown.bs.modal', () => {
-      input.focus();
-    });
-
-    form.addEventListener('submit', async (e) => {
-      if (form.action.endsWith('/keys')) {
-        e.preventDefault();
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-
-        try {
-          const response = await fetch('/keys', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          });
-
-          if (response.ok) {
-            const { apiKey } = await response.json();
-            const newApiKeySection = document.getElementById('newApiKeySection');
-            const newApiKeyElement = document.getElementById('newApiKey');
-            const copyNewApiKeyButton = document.getElementById('copyNewApiKey');
-
-            newApiKeyElement.textContent = apiKey;
-            copyNewApiKeyButton.setAttribute('data-copy-text', apiKey);
-            newApiKeySection.classList.remove('d-none');
-
-            copyNewApiKeyButton.addEventListener('click', () => {
-              navigator.clipboard.writeText(apiKey).then(() => {
-                copyNewApiKeyButton.innerHTML = '<i class="bi bi-check-lg me-2"></i> Copied!';
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
-              });
-            });
-
-            // Expect Bootstrap JS loaded globally in bundle
-            const modal = window.bootstrap ? window.bootstrap.Modal.getInstance(apiKeyModal) : null;
-            modal.hide();
-          } else {
-            alert('Error creating API key');
-          }
-        } catch (error) {
-          alert('Error creating API key');
-        }
+  const deleteKey = async (id) => {
+    if (!confirm('Are you sure you want to delete this API key?')) {
+      return;
+    }
+    try {
+      const response = await fetch(`/api/v3/api-keys/${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        throw new Error('Failed to delete key');
       }
-    });
-  }
+      await fetchKeys();
+    } catch (error) {
+      console.error(error);
+      alert('Error deleting API key.');
+    }
+  };
 
-  document.querySelectorAll('[data-delete-key]').forEach((button) => {
-    button.addEventListener('click', async (e) => {
-      if (confirm('Are you sure you want to delete this API key?')) {
-        const keyId = button.getAttribute('data-key-id');
-        try {
-          const response = await fetch(`/keys/${keyId}/delete`, {
-            method: 'POST'
-          });
-          if (response.ok) {
-            window.location.reload();
-          } else {
-            alert('Error deleting API key');
-          }
-        } catch (error) {
-          alert('Error deleting API key');
-        }
-      }
+  // Event Listeners
+  createKeyBtn.addEventListener('click', () => openKeyModal());
+  refreshKeysBtn.addEventListener('click', fetchKeys);
+  saveKeyBtn.addEventListener('click', saveKey);
+
+  tableBody.addEventListener('click', (e) => {
+    const editBtn = e.target.closest('.edit-btn');
+    if (editBtn) {
+      const { id, label } = editBtn.dataset;
+      openKeyModal(id, label);
+      return;
+    }
+
+    const deleteBtn = e.target.closest('.delete-btn');
+    if (deleteBtn) {
+      deleteKey(deleteBtn.dataset.id);
+    }
+  });
+
+  copyKeyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(newApiKeyInput.value).then(() => {
+      const originalIcon = copyKeyBtn.innerHTML;
+      copyKeyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+      setTimeout(() => {
+        copyKeyBtn.innerHTML = originalIcon;
+      }, 2000);
     });
   });
+
+  showKeyModalEl.addEventListener('hidden.bs.modal', fetchKeys);
+
+  // Initial fetch
+  fetchKeys();
 });

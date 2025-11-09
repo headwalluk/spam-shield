@@ -1,6 +1,6 @@
 // Knex configuration for migrations and seeds
 // Uses the application's config in src/config/index.js
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 const appConfig = require('./src/config');
 

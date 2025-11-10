@@ -22,7 +22,9 @@ module.exports = {
   env: process.env.NODE_ENV,
   instance: process.env.NODE_APP_INSTANCE,
   server: {
-    listenPort: Number(process.env.LISTEN_PORT) || 8080
+    listenPort: Number(process.env.LISTEN_PORT) || 8080,
+    // Set to a number (e.g., 1) when behind a reverse proxy/ingress to trust X-Forwarded-* headers
+    trustProxy: Number(process.env.TRUST_PROXY || 0)
   },
   db: {
     host: process.env.DB_HOST || 'localhost',
@@ -41,6 +43,11 @@ module.exports = {
     enableRegistration: (process.env.AUTH_ENABLE_REGISTRATION || 'true').toLowerCase() !== 'false',
     sessionSecret: process.env.SESSION_SECRET || 'dev-insecure-secret',
     sessionCookieName: process.env.SESSION_COOKIE_NAME || 'sid',
+    // Default secure cookies in production; allow override for local HTTP testing
+    sessionCookieSecure:
+      typeof process.env.SESSION_COOKIE_SECURE === 'string'
+        ? (process.env.SESSION_COOKIE_SECURE || '').toLowerCase() === 'true'
+        : rawNodeEnv === 'production',
     apiKeyHeader: process.env.API_KEY_HEADER || 'x-api-key',
     resetTokenTTLMinutes: Number(process.env.RESET_TOKEN_TTL_MINUTES || 60),
     verifyEmailTokenTTLMinutes: Number(process.env.VERIFY_EMAIL_TOKEN_TTL_MINUTES || 60),

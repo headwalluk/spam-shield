@@ -1,164 +1,18 @@
-(() => {
-  // public/js/messages.js
-  async function fetchJson(url, opts = {}) {
-    const res = await fetch(url, { credentials: 'same-origin', ...opts });
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      throw new Error(`${res.status} ${res.statusText} ${text}`.trim());
-    }
-    return res.json();
-  }
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-  function html(strings, ...values) {
-    return strings.reduce(
-      (out, s, i) => out + s + (i < values.length ? String(values[i]) : ''),
-      ''
-    );
-  }
-  var state = {
-    page: 1,
-    pageSize: 10,
-    q: ''
-  };
-  function flagEmoji(countryCode) {
-    if (!countryCode) return '';
-    const code = countryCode.trim().toUpperCase();
-    if (!/^[A-Z]{2}$/.test(code)) return '';
-    return code
-      .split('')
-      .map((c) => String.fromCodePoint(127462 - 65 + c.charCodeAt(0)))
-      .join('');
-  }
-  function badge(key, value) {
-    const content = value == null ? '' : String(value);
-    if (!content) return '';
-    return `<span class="badge text-bg-secondary me-1">${escapeHtml(key)}: ${escapeHtml(content)}</span>`;
-  }
-  function renderCard(row) {
-    const ip = row.sender_ip || '';
-    const country = row.sender_country || '';
-    const ttr = Number(row.time_to_result) || 0;
-    let fields = '';
-    try {
-      const mf =
-        typeof row.message_fields === 'string'
-          ? JSON.parse(row.message_fields)
-          : row.message_fields;
-      if (mf && typeof mf === 'object') {
-        for (const [k, v] of Object.entries(mf)) {
-          fields += badge(k, v);
-        }
-      }
-    } catch (e) {}
-    const headerBits = [];
-    if (ip) headerBits.push(`<span title="Sender IP">${escapeHtml(ip)}</span>`);
-    if (country)
-      headerBits.push(`<span title="Country">${flagEmoji(country)} ${escapeHtml(country)}</span>`);
-    const header = headerBits.join(' \xB7 ');
-    const body = escapeHtml(row.message_body || '');
-    const when = row.event_time ? new Date(row.event_time).toLocaleString() : '';
-    const resultBadge = row.is_spam
-      ? '<span class="badge text-bg-danger">Spam</span>'
-      : row.is_ham
-        ? '<span class="badge text-bg-success">Ham</span>'
-        : '';
-    return html` <div class="col-12">
-      <div class="card h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center gap-2">
-            ${resultBadge}
-            <span>${header || '<span class="text-muted">Unknown sender</span>'}</span>
-          </div>
-          <div>${fields}</div>
+(()=>{async function v(e,n={}){let t=await fetch(e,{credentials:"same-origin",...n});if(!t.ok){let a=await t.text().catch(()=>"");throw new Error(`${t.status} ${t.statusText} ${a}`.trim())}return t.json()}function d(e){return String(e).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}function y(e,...n){return e.reduce((t,a,i)=>t+a+(i<n.length?String(n[i]):""),"")}var r={page:1,pageSize:10,q:""};function $(e){if(!e)return"";let n=e.trim().toUpperCase();return/^[A-Z]{2}$/.test(n)?n.split("").map(t=>String.fromCodePoint(127397+t.charCodeAt(0))).join(""):""}function x(e,n){let t=n==null?"":String(n);return t?`<span class="badge text-bg-secondary me-1">${d(e)}: ${d(t)}</span>`:""}function S(e){let n=e.sender_ip||"",t=e.sender_country||"",a=Number(e.time_to_result)||0,i="";try{let c=typeof e.message_fields=="string"?JSON.parse(e.message_fields):e.message_fields;if(c&&typeof c=="object")for(let[u,h]of Object.entries(c))i+=x(u,h)}catch{}let s=[];n&&s.push(`<span title="Sender IP">${d(n)}</span>`),t&&s.push(`<span title="Country">${$(t)} ${d(t)}</span>`);let p=s.join(" \xB7 "),l=d(e.message_body||""),g=e.event_time?new Date(e.event_time).toLocaleString():"",o=e.is_spam?'<span class="badge text-bg-danger">Spam</span>':e.is_ham?'<span class="badge text-bg-success">Ham</span>':"";return y` <div class="col-12">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          ${o}
+          <span>${p||'<span class="text-muted">Unknown sender</span>'}</span>
         </div>
-        <div class="card-body">
-          <pre class="mb-0" style="white-space: pre-wrap;">${body}</pre>
-        </div>
-        <div class="card-footer d-flex justify-content-between align-items-center small text-muted">
-          <span>${when}</span>
-          <span title="Classification time">${ttr} ms</span>
-        </div>
+        <div>${i}</div>
       </div>
-    </div>`;
-  }
-  function renderPagination(p) {
-    const ul = document.getElementById('messagesPagination');
-    ul.innerHTML = '';
-    const { currentPage, totalPages } = p;
-    function li(page, label, disabled = false, active = false) {
-      const li2 = document.createElement('li');
-      li2.className = `page-item${disabled ? ' disabled' : ''}${active ? ' active' : ''}`;
-      const a = document.createElement('a');
-      a.className = 'page-link';
-      a.href = '#';
-      a.textContent = label;
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (disabled || active) return;
-        state.page = page;
-        load();
-      });
-      li2.appendChild(a);
-      ul.appendChild(li2);
-    }
-    li(Math.max(1, currentPage - 1), 'Prev', currentPage <= 1);
-    for (let i = 1; i <= totalPages; i++) {
-      li(i, String(i), false, i === currentPage);
-    }
-    li(Math.min(totalPages, currentPage + 1), 'Next', currentPage >= totalPages);
-  }
-  async function load() {
-    const status = document.getElementById('messagesStatus');
-    const list = document.getElementById('messagesList');
-    status.textContent = 'Loading\u2026';
-    list.innerHTML = '';
-    const params = new URLSearchParams();
-    params.set('page', String(state.page));
-    params.set('pageSize', String(state.pageSize));
-    if (state.q) params.set('q', state.q);
-    try {
-      const data = await fetchJson(`/api/dash/messages?${params.toString()}`);
-      const { items, pagination } = data;
-      if (!items || items.length === 0) {
-        status.textContent = 'No messages found';
-        renderPagination(pagination);
-        return;
-      }
-      status.textContent = `${pagination.total} total, page ${pagination.currentPage} of ${pagination.totalPages}`;
-      list.innerHTML = items.map(renderCard).join('');
-      renderPagination(pagination);
-    } catch (err) {
-      status.textContent = 'Failed to load messages';
-      console.error(err);
-    }
-  }
-  function bindSearch() {
-    const form = document.getElementById('searchForm');
-    const input = document.getElementById('searchQuery');
-    const clear = document.getElementById('clearSearch');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      state.q = input.value.trim();
-      state.page = 1;
-      load();
-    });
-    clear.addEventListener('click', () => {
-      input.value = '';
-      state.q = '';
-      state.page = 1;
-      load();
-    });
-  }
-  document.addEventListener('DOMContentLoaded', () => {
-    bindSearch();
-    load();
-  });
-})();
-//# sourceMappingURL=messages.bundle.js.map
+      <div class="card-body">
+        <pre class="mb-0" style="white-space: pre-wrap;">${l}</pre>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center small text-muted">
+        <span>${g}</span>
+        <span title="Classification time">${a} ms</span>
+      </div>
+    </div>
+  </div>`}function f(e){let n=document.getElementById("messagesPagination");n.innerHTML="";let{currentPage:t,totalPages:a}=e;function i(s,p,l=!1,g=!1){let o=document.createElement("li");o.className=`page-item${l?" disabled":""}${g?" active":""}`;let c=document.createElement("a");c.className="page-link",c.href="#",c.textContent=p,c.addEventListener("click",u=>{u.preventDefault(),!(l||g)&&(r.page=s,m())}),o.appendChild(c),n.appendChild(o)}i(Math.max(1,t-1),"Prev",t<=1);for(let s=1;s<=a;s++)i(s,String(s),!1,s===t);i(Math.min(a,t+1),"Next",t>=a)}async function m(){let e=document.getElementById("messagesStatus"),n=document.getElementById("messagesList");e.textContent="Loading\u2026",n.innerHTML="";let t=new URLSearchParams;t.set("page",String(r.page)),t.set("pageSize",String(r.pageSize)),r.q&&t.set("q",r.q);try{let a=await v(`/api/dash/messages?${t.toString()}`),{items:i,pagination:s}=a;if(!i||i.length===0){e.textContent="No messages found",f(s);return}e.textContent=`${s.total} total, page ${s.currentPage} of ${s.totalPages}`,n.innerHTML=i.map(S).join(""),f(s)}catch(a){e.textContent="Failed to load messages",console.error(a)}}function b(){let e=document.getElementById("searchForm"),n=document.getElementById("searchQuery"),t=document.getElementById("clearSearch");e.addEventListener("submit",a=>{a.preventDefault(),r.q=n.value.trim(),r.page=1,m()}),t.addEventListener("click",()=>{n.value="",r.q="",r.page=1,m()})}document.addEventListener("DOMContentLoaded",()=>{b(),m()});})();

@@ -25,6 +25,10 @@ const app = express();
 
 // Middleware setup
 // app.use(morgan('dev'));
+// If running behind a reverse proxy/ingress, trust X-Forwarded-* headers so secure cookies and req.secure work correctly
+if (config.server.trustProxy) {
+  app.set('trust proxy', config.server.trustProxy);
+}
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -49,7 +53,7 @@ app.use(
     store,
     cookie: {
       httpOnly: true,
-      secure: config.env === 'production',
+      secure: config.auth.sessionCookieSecure,
       sameSite: 'lax'
     }
   })

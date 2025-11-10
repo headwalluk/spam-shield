@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2025-11-10T19:11:56.840Z",
+  "watch": false,
+  "dist": true,
+  "assets": [
+    {
+      "type": "main-js",
+      "file": "build/bundle.js"
+    },
+    {
+      "type": "login-js",
+      "file": "build/login.bundle.js"
+    },
+    {
+      "type": "dashboard-js",
+      "file": "build/dashboard.bundle.js"
+    },
+    {
+      "type": "api-keys-js",
+      "file": "build/api-keys.bundle.js"
+    },
+    {
+      "type": "admin-users-js",
+      "file": "build/admin-users.bundle.js"
+    },
+    {
+      "type": "admin-dashboard-js",
+      "file": "build/admin-dashboard.bundle.js"
+    },
+    {
+      "type": "admin-countries-js",
+      "file": "build/admin-countries.bundle.js"
+    },
+    {
+      "type": "admin-bad-phrases-js",
+      "file": "build/admin-bad-phrases.bundle.js"
+    },
+    {
+      "type": "admin-salutations-js",
+      "file": "build/admin-salutations.bundle.js"
+    },
+    {
+      "type": "security-js",
+      "file": "build/security.bundle.js"
+    },
+    {
+      "type": "register-js",
+      "file": "build/register.bundle.js"
+    },
+    {
+      "type": "reset-password-js",
+      "file": "build/reset-password.bundle.js"
+    },
+    {
+      "type": "messages-js",
+      "file": "build/messages.bundle.js"
+    },
+    {
+      "type": "css",
+      "file": "build/bundle.css"
+    }
+  ]
+}

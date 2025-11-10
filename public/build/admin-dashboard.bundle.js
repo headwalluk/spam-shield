@@ -1,58 +1,8 @@
-(() => {
-  // public/js/admin-dashboard.js
-  if (typeof window.assertBootstrapReady === 'function') {
-    window.assertBootstrapReady('admin-dashboard');
-  }
-  document.addEventListener('DOMContentLoaded', () => {
-    const tilesContainer = document.getElementById('tiles-container');
-    const renderTiles = (tiles) => {
-      if (!tilesContainer) {
-        return;
-      }
-      tilesContainer.innerHTML = '';
-      if (!tiles || tiles.length === 0) {
-        tilesContainer.innerHTML = '<p class="text-muted">No items to display.</p>';
-        return;
-      }
-      tiles.forEach((tile) => {
-        const tileEl = document.createElement('div');
-        tileEl.className = 'col-lg-3 col-md-6 mb-4';
-        tileEl.innerHTML = `
-        <a href="${tile.url}" class="card text-decoration-none h-100">
+(()=>{typeof window.assertBootstrapReady=="function"&&window.assertBootstrapReady("admin-dashboard");document.addEventListener("DOMContentLoaded",()=>{let e=document.getElementById("tiles-container"),o=t=>{if(e){if(e.innerHTML="",!t||t.length===0){e.innerHTML='<p class="text-muted">No items to display.</p>';return}t.forEach(a=>{let n=document.createElement("div");n.className="col-lg-3 col-md-6 mb-4",n.innerHTML=`
+        <a href="${a.url}" class="card text-decoration-none h-100">
           <div class="card-body text-center d-flex flex-column justify-content-center">
-            <i class="${tile.iconClasses}"></i>
-            <h5 class="card-title mt-3">${tile.text}</h5>
+            <i class="${a.iconClasses}"></i>
+            <h5 class="card-title mt-3">${a.text}</h5>
           </div>
         </a>
-      `;
-        tilesContainer.appendChild(tileEl);
-      });
-    };
-    const loadAdminDashboard = async () => {
-      try {
-        const response = await fetch('/api/v3/state');
-        if (!response.ok) {
-          throw new Error('Failed to fetch admin state');
-        }
-        const { sitemap } = await response.json();
-        const adminConfig = sitemap.find((item) => item.url === '/admin');
-        if (adminConfig && adminConfig.tiles) {
-          renderTiles(adminConfig.tiles);
-        } else {
-          if (tilesContainer) {
-            tilesContainer.innerHTML =
-              '<p class="text-warning">You do not have permission to view this page, or it is misconfigured.</p>';
-          }
-        }
-      } catch (error) {
-        console.error('Error loading admin dashboard:', error);
-        if (tilesContainer) {
-          tilesContainer.innerHTML =
-            '<p class="text-danger">Error loading admin dashboard content.</p>';
-        }
-      }
-    };
-    loadAdminDashboard();
-  });
-})();
-//# sourceMappingURL=admin-dashboard.bundle.js.map
+      `,e.appendChild(n)})}};(async()=>{try{let t=await fetch("/api/v3/state");if(!t.ok)throw new Error("Failed to fetch admin state");let{sitemap:a}=await t.json(),n=a.find(i=>i.url==="/admin");n&&n.tiles?o(n.tiles):e&&(e.innerHTML='<p class="text-warning">You do not have permission to view this page, or it is misconfigured.</p>')}catch(t){console.error("Error loading admin dashboard:",t),e&&(e.innerHTML='<p class="text-danger">Error loading admin dashboard content.</p>')}})()});})();

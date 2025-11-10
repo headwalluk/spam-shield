@@ -1,0 +1,76 @@
+/**
+ * PM2 Ecosystem Configuration Sample
+ * 
+ * Copy this file to ecosystem.config.js and adjust settings for your environment.
+ * 
+ * Documentation: https://pm2.keymetrics.io/docs/usage/application-declaration/
+ */
+
+module.exports = {
+  apps: [
+    {
+      name: 'spam-shield',
+      script: './src/server.js',
+      
+      // Cluster mode configuration
+      instances: 'max', // or specific number like 4
+      exec_mode: 'cluster',
+      
+      // Environment
+      env: {
+        NODE_ENV: 'production',
+        LISTEN_PORT: 8080
+      },
+      
+      // Logging
+      error_file: './logs/pm2-error.log',
+      out_file: './logs/pm2-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      
+      // Process management
+      autorestart: true,
+      max_restarts: 10,
+      min_uptime: '10s',
+      max_memory_restart: '500M',
+      
+      // Graceful shutdown
+      kill_timeout: 5000,
+      wait_ready: false,
+      listen_timeout: 3000,
+      
+      // Advanced features
+      watch: false, // Set to true in development if desired
+      ignore_watch: ['node_modules', 'logs', 'test-messages', '.git'],
+      
+      // Environment-specific overrides
+      env_development: {
+        NODE_ENV: 'development',
+        LISTEN_PORT: 3000,
+        watch: true
+      },
+      
+      env_staging: {
+        NODE_ENV: 'production',
+        LISTEN_PORT: 8080
+      },
+      
+      env_production: {
+        NODE_ENV: 'production',
+        LISTEN_PORT: 8080
+      }
+    }
+  ],
+  
+  // Deployment configuration (optional)
+  deploy: {
+    production: {
+      user: 'deploy',
+      host: ['server1.example.com'],
+      ref: 'origin/main',
+      repo: 'git@github.com:headwalluk/spam-shield.git',
+      path: '/var/www/spam-shield',
+      'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.js --env production'
+    }
+  }
+};

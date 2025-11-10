@@ -1,6 +1,7 @@
 const messageModel = require('../models/messageModel');
 const ipEventModel = require('../models/ipEventModel');
 const { getLatestCountryForIp } = require('../models/ipEventModel');
+const { tokenize } = require('./messageTokenizer');
 
 function basicScorePipeline({ message }) {
   const start = Date.now();
@@ -46,9 +47,10 @@ function westernLatinCharRatio(str) {
   return total === 0 ? 1 : allowedCount / total;
 }
 
-async function classifyAndLog({ ip, fields, message, hints = {}, caller = null }) {
+async function classifyAndLog({ ip, fields, message, hints = {}, caller = null, userId = null }) {
   const start = Date.now();
   const inTest = process.env.NODE_ENV === 'test';
+  const inDev = process.env.NODE_ENV === 'development';
   const pipeline = basicScorePipeline({ message });
   // Attempt to derive country from prior events (best-effort, may be null)
   let senderCountry = null;
@@ -162,6 +164,7 @@ async function classifyAndLog({ ip, fields, message, hints = {}, caller = null }
 
   if (!inTest) {
     await messageModel.logMessage({
+      user_id: userId,
       sender_ip: ip,
       is_spam: result.classification.isSpam,
       is_ham: result.classification.isHam,
@@ -183,7 +186,7 @@ async function classifyAndLog({ ip, fields, message, hints = {}, caller = null }
     });
   }
 
-  return {
+  const response = {
     timing: {
       start: new Date(start).toISOString(),
       end: new Date().toISOString(),
@@ -192,6 +195,19 @@ async function classifyAndLog({ ip, fields, message, hints = {}, caller = null }
     },
     result
   };
+
+  // Attach diagnostics in development to aid tokenizer tuning
+  if (inDev) {
+    try {
+      response.diagnostics = {
+        tokenizedMessage: tokenize(message || '', { caller: caller || null })
+      };
+    } catch (e) {
+      response.diagnostics = { error: 'tokenizer_failed', detail: e.message };
+    }
+  }
+
+  return response;
 }
 
 module.exports = { classifyAndLog };

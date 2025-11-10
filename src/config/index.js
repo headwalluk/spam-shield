@@ -12,8 +12,15 @@ if (rawNodeEnv !== process.env.NODE_ENV) {
   process.env.NODE_ENV = rawNodeEnv;
 }
 
+// Normalize NODE_APP_INSTANCE for PM2 cluster mode
+// PM2 sets this to identify each instance (0, 1, 2, etc.)
+if (process.env.NODE_APP_INSTANCE === undefined) {
+  process.env.NODE_APP_INSTANCE = '0';
+}
+
 module.exports = {
   env: process.env.NODE_ENV,
+  instance: process.env.NODE_APP_INSTANCE,
   server: {
     listenPort: Number(process.env.LISTEN_PORT) || 8080
   },

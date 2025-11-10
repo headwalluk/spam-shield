@@ -7,6 +7,8 @@
  *  - Copies already-built optimized assets from public/build
  *  - Copies favicon/images
  *  - Produces a dist/manifest.json including hashes for cache busting
+ *
+ * Can be used as a module (exported buildDist) or run directly as a CLI.
  */
 
 const path = require('path');
@@ -39,7 +41,7 @@ async function copyAndMinifyHtml(srcFile, destFile) {
   await fs.outputFile(destFile, minified, 'utf8');
 }
 
-async function build() {
+async function buildDist() {
   console.log('[dist] Cleaning dist directory');
   await fs.remove(distDir);
   await fs.ensureDir(distDir);
@@ -120,8 +122,11 @@ async function build() {
   await fs.writeJson(path.join(distDir, 'manifest.json'), manifest, { spaces: 2 });
   console.log('[dist] Done');
 }
+module.exports = { buildDist };
 
-build().catch((err) => {
-  console.error('[dist] Build failed', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  buildDist().catch((err) => {
+    console.error('[dist] Build failed', err);
+    process.exit(1);
+  });
+}

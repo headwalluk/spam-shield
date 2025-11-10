@@ -3,9 +3,6 @@ const router = express.Router();
 const badPhrasesModel = require('../../../models/badPhrasesModel');
 const { requireAdmin } = require('../../../middleware/authz');
 
-// Ensure initial load (non-blocking if fails)
-badPhrasesModel.reload().catch(() => {});
-
 /**
  * @openapi
  * /api/v3/bad-phrases:
@@ -108,6 +105,8 @@ router.post('/', requireAdmin, async (req, res) => {
   }
   try {
     const created = await badPhrasesModel.create({ phrase: phrase.trim(), score });
+    // Reload cache after creation so classification picks up the new phrase
+    badPhrasesModel.loadCache().catch(() => {});
     return res.status(201).json(created);
   } catch (e) {
     if (/duplicate/i.test(e.message)) {
@@ -119,13 +118,19 @@ router.post('/', requireAdmin, async (req, res) => {
 
 router.put('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const existing = badPhrasesModel.findById(id);
+  // Check if phrase exists in DB
+  const existing = await badPhrasesModel.findById(id);
   if (!existing) {
     return res.status(404).json({ error: 'not found' });
   }
   const { phrase, score } = req.body || {};
   try {
     const updated = await badPhrasesModel.update(id, { phrase, score });
+    if (!updated) {
+      return res.status(404).json({ error: 'not found' });
+    }
+    // Reload cache after update
+    badPhrasesModel.loadCache().catch(() => {});
     return res.status(200).json(updated);
   } catch (e) {
     return res.status(500).json({ error: 'failed to update phrase', detail: e.message });
@@ -134,12 +139,18 @@ router.put('/:id', requireAdmin, async (req, res) => {
 
 router.delete('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const existing = badPhrasesModel.findById(id);
+  // Check if phrase exists in DB
+  const existing = await badPhrasesModel.findById(id);
   if (!existing) {
     return res.status(404).json({ error: 'not found' });
   }
   try {
-    await badPhrasesModel.remove(id);
+    const deleted = await badPhrasesModel.delete(id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'not found' });
+    }
+    // Reload cache after deletion
+    badPhrasesModel.loadCache().catch(() => {});
     return res.status(204).send();
   } catch (e) {
     return res.status(500).json({ error: 'failed to delete phrase', detail: e.message });

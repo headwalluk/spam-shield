@@ -93,6 +93,22 @@ async function start() {
     }
   }
 
+  // Load classification caches
+  const badPhrasesModel = require('./models/badPhrasesModel');
+  const salutationsModel = require('./models/salutationsModel');
+  try {
+    const badPhrasesCount = await badPhrasesModel.loadCache();
+    console.log(`Loaded ${badPhrasesCount} bad phrases into cache for classification`);
+  } catch (err) {
+    console.warn('Failed to load bad phrases cache:', err.message);
+  }
+  try {
+    const salutationsCount = await salutationsModel.loadCache();
+    console.log(`Loaded ${salutationsCount} salutations into cache for classification`);
+  } catch (err) {
+    console.warn('Failed to load salutations cache:', err.message);
+  }
+
   const server = express();
   server.use(app);
   server.listen(config.server.listenPort, () => {

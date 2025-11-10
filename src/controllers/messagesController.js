@@ -25,6 +25,7 @@ class MessagesController {
     try {
       // Support optional X-Caller header
       const caller = req.header('X-Caller') || null;
+      const userId = req.user && req.user.id ? Number(req.user.id) : null;
       const body = req.body || {};
       // Sanitize inputs with defaults as requested
       const ip = typeof body.ip === 'string' ? body.ip : '';
@@ -39,7 +40,8 @@ class MessagesController {
         fields,
         message,
         hints,
-        caller
+        caller,
+        userId
       });
       return res.status(201).json(data);
     } catch (err) {

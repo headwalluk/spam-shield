@@ -32,6 +32,11 @@ router.get('/', (req, res) => {
       url: '/dash',
       tiles: [
         {
+          text: 'Messages',
+          iconClasses: 'bi bi-chat-left-text-fill display-3',
+          url: '/dash/messages'
+        },
+        {
           text: 'API Keys',
           iconClasses: 'bi bi-key-fill display-3',
           url: '/dash/api-keys'

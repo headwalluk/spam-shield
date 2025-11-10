@@ -3,8 +3,6 @@ const router = express.Router();
 const { requireAdmin } = require('../../../middleware/authz');
 const salutationsModel = require('../../../models/salutationsModel');
 
-salutationsModel.reload().catch(() => {});
-
 /**
  * @openapi
  * /api/v3/salutations:
@@ -73,6 +71,8 @@ router.post('/', requireAdmin, async (req, res) => {
   }
   try {
     const created = await salutationsModel.create({ phrase: phrase.trim(), score });
+    // Reload cache after creation so classification picks up the new phrase
+    salutationsModel.loadCache().catch(() => {});
     res.status(201).json(created);
   } catch (e) {
     if (/duplicate|UNIQUE/i.test(e.message)) {
@@ -84,13 +84,19 @@ router.post('/', requireAdmin, async (req, res) => {
 
 router.put('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const existing = salutationsModel.findById(id);
+  // Check if salutation exists in DB
+  const existing = await salutationsModel.findById(id);
   if (!existing) {
     return res.status(404).json({ error: 'not found' });
   }
   const { phrase, score } = req.body || {};
   try {
     const updated = await salutationsModel.update(id, { phrase, score });
+    if (!updated) {
+      return res.status(404).json({ error: 'not found' });
+    }
+    // Reload cache after update
+    salutationsModel.loadCache().catch(() => {});
     res.json(updated);
   } catch (e) {
     res.status(500).json({ error: 'failed to update salutation', detail: e.message });
@@ -99,12 +105,18 @@ router.put('/:id', requireAdmin, async (req, res) => {
 
 router.delete('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const existing = salutationsModel.findById(id);
+  // Check if salutation exists in DB
+  const existing = await salutationsModel.findById(id);
   if (!existing) {
     return res.status(404).json({ error: 'not found' });
   }
   try {
-    await salutationsModel.remove(id);
+    const deleted = await salutationsModel.delete(id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'not found' });
+    }
+    // Reload cache after deletion
+    salutationsModel.loadCache().catch(() => {});
     res.status(204).send();
   } catch (e) {
     res.status(500).json({ error: 'failed to delete salutation', detail: e.message });

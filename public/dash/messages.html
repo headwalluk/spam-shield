@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your Messages - Spam Shield</title>
+    <link rel="icon" type="image/webp" href="/headwall-icon.webp" />
+    <link rel="stylesheet" href="/build/bundle.css" />
+  </head>
+  <body>
+    <!-- Toast container for notifications (optional) -->
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <header id="header-placeholder"></header>
+    <main class="container py-4">
+      <div class="d-flex align-items-center mb-3">
+        <h1 class="h4 m-0">Recent Messages</h1>
+      </div>
+
+      <form id="searchForm" class="row g-2 align-items-end mb-3">
+        <div class="col-sm-6 col-md-4">
+          <label for="searchQuery" class="form-label">Search message text</label>
+          <input
+            type="text"
+            id="searchQuery"
+            class="form-control"
+            placeholder="Search message body"
+          />
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-outline-secondary" id="clearSearch" type="button">Clear</button>
+        </div>
+      </form>
+
+      <div id="messagesStatus" class="mb-2 small text-muted"></div>
+      <div id="messagesList" class="row g-3"></div>
+
+      <nav class="mt-4" aria-label="Messages pagination">
+        <ul id="messagesPagination" class="pagination"></ul>
+      </nav>
+    </main>
+    <footer id="footer-placeholder"></footer>
+
+    <script src="/build/bundle.js"></script>
+    <script src="/build/messages.bundle.js"></script>
+  </body>
+</html>

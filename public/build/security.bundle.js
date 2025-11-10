@@ -1,19 +1,19 @@
 (() => {
   // public/js/security.js
-  if (typeof window.assertBootstrapReady === "function") {
-    window.assertBootstrapReady("security");
+  if (typeof window.assertBootstrapReady === 'function') {
+    window.assertBootstrapReady('security');
   }
-  document.addEventListener("DOMContentLoaded", () => {
-    const securityForm = document.getElementById("security-form");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const toastContainer = document.querySelector(".toast-container");
-    const showToast = (message, type = "success") => {
-      const toastEl = document.createElement("div");
+  document.addEventListener('DOMContentLoaded', () => {
+    const securityForm = document.getElementById('security-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const toastContainer = document.querySelector('.toast-container');
+    const showToast = (message, type = 'success') => {
+      const toastEl = document.createElement('div');
       toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
-      toastEl.role = "alert";
-      toastEl.ariaLive = "assertive";
-      toastEl.ariaAtomic = "true";
+      toastEl.role = 'alert';
+      toastEl.ariaLive = 'assertive';
+      toastEl.ariaAtomic = 'true';
       toastEl.innerHTML = `
       <div class="d-flex">
         <div class="toast-body">${message}</div>
@@ -21,30 +21,30 @@
       </div>
     `;
       if (!toastContainer) {
-        console.error("Toast container not found!");
+        console.error('Toast container not found!');
         return;
       }
       toastContainer.appendChild(toastEl);
       if (window.bootstrap) {
         const toast = new window.bootstrap.Toast(toastEl, { autohide: true, delay: 5e3 });
         toast.show();
-        toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
+        toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
       }
     };
     const loadCurrentUser = async () => {
       try {
-        const response = await fetch("/api/v3/auth/me");
+        const response = await fetch('/api/v3/auth/me');
         if (!response.ok) {
-          throw new Error("Failed to fetch user data");
+          throw new Error('Failed to fetch user data');
         }
         const user = await response.json();
         emailInput.value = user.email;
       } catch (error) {
-        console.error("Error loading user data:", error);
-        showToast("Could not load your current information.", "danger");
+        console.error('Error loading user data:', error);
+        showToast('Could not load your current information.', 'danger');
       }
     };
-    securityForm.addEventListener("submit", async (e) => {
+    securityForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = emailInput.value;
       const password = passwordInput.value;
@@ -53,20 +53,20 @@
         payload.password = password;
       }
       try {
-        const response = await fetch("/api/v3/auth/me", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch('/api/v3/auth/me', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: "Failed to update" }));
-          throw new Error(errorData.message || "An unknown error occurred");
+          const errorData = await response.json().catch(() => ({ message: 'Failed to update' }));
+          throw new Error(errorData.message || 'An unknown error occurred');
         }
-        showToast("Your details have been updated successfully.");
-        passwordInput.value = "";
+        showToast('Your details have been updated successfully.');
+        passwordInput.value = '';
       } catch (error) {
-        console.error("Error updating details:", error);
-        showToast(`Update failed: ${error.message}`, "danger");
+        console.error('Error updating details:', error);
+        showToast(`Update failed: ${error.message}`, 'danger');
       }
     });
     loadCurrentUser();

@@ -28,12 +28,17 @@ router.get('/dash', (_req, res) => {
   res.sendFile(path.join(getStaticRoot(), 'dash', 'index.html'));
 });
 
+// Normalize trailing slashes for key entry points
+
 router.get('/dash/api-keys', (_req, res) => {
   res.sendFile(path.join(getStaticRoot(), 'dash', 'api-keys.html'));
 });
 
 router.get('/dash/security', (_req, res) => {
   res.sendFile(path.join(getStaticRoot(), 'dash', 'security.html'));
+});
+router.get('/dash/messages', (_req, res) => {
+  res.sendFile(path.join(getStaticRoot(), 'dash', 'messages.html'));
 });
 
 router.get('/admin', (_req, res) => {
@@ -80,6 +85,7 @@ router.get('/admin/salutations.html', (_req, res) => res.redirect(301, '/admin/s
 router.get('/admin/bad-phrases.html', (_req, res) => res.redirect(301, '/admin/bad-phrases'));
 router.get('/dash/index.html', (_req, res) => res.redirect(301, '/dash'));
 router.get('/dash/api-keys.html', (_req, res) => res.redirect(301, '/dash/api-keys'));
+router.get('/dash/messages.html', (_req, res) => res.redirect(301, '/dash/messages'));
 router.post('/logout', (req, res) => {
   req.logout(() => res.status(204).send());
 });

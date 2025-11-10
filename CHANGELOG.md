@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.5.1] - 2025-11-10
+
+### Added
+
+- Server-side HTML composition middleware (`htmlCompose`): inlines header and footer partials, minifies HTML (html-minifier-terser), and caches rendered pages with mtime-based invalidation for fast repeat loads.
+- Extension-less route support: `/dash` and `/login` (and similar) resolve to `index.html` or `.html` automatically through the compose layer.
+
+### Changed
+
+- Removed legacy client-side header/footer fetch & DOM injection (eliminates flash of unstyled/unframed content and two HTTP requests per page).
+- Theme application moved to a lightweight cookie-driven rewrite earlier in the pipeline; automatic theme initialization now handled solely by `public/js/theme.js`.
+- Documentation page (`public/doc/index.html`) structure aligned with dashboard layout (scripts deferred to end, consistent Bootstrap container structure, unified buttons).
+- Lint cleanup across codebase: enforced `curly` rule everywhere; removed unused variables/catch parameters; converted eligible `let` to `const` in tokenizer.
+
+### Fixed
+
+- Eliminated remaining `curly` rule violations and `no-unused-vars` warnings (notably in `messages.js`, `app.js`, tokenizer, and tests) for a clean `npm run lint`.
+
+### Notes
+
+- Middleware now produces fully inlined HTML suitable for future edge caching/CDN strategies. Further enhancement ideas: add ETag generation for composed pages, optional Brotli precompression in production, and instrumentation counters for cache hit ratio.
+
 ## [0.5.0] - 2025-11-09
 
 ### Added

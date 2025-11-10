@@ -141,3 +141,6 @@ src/public/build/*
 # Test messages may contain personally identifiable information
 test-messages/known-spam/*.json
 test-messages/known-ham/*.json
+
+# PM2 ecosystem config (may contain server-specific settings)
+ecosystem.config.js

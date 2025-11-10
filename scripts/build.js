@@ -1,5 +1,7 @@
 const esbuild = require('esbuild');
+const { buildDist } = require('./build-dist');
 const isWatch = process.argv.includes('--watch');
+const isDist = process.argv.includes('--dist');
 
 // Enable source maps only for watch/dev (not production build)
 const sharedConfig = {
@@ -109,6 +111,14 @@ async function run() {
         }
       },
       {
+        name: 'messages-js',
+        options: {
+          ...sharedConfig,
+          entryPoints: ['public/js/messages.js'],
+          outfile: 'public/build/messages.bundle.js'
+        }
+      },
+      {
         name: 'css',
         options: {
           ...sharedConfig,
@@ -144,15 +154,22 @@ async function run() {
     const manifest = {
       generatedAt: new Date().toISOString(),
       watch: isWatch,
+      dist: isDist,
       assets: tasks.map((t) => ({ type: t.name, file: t.options.outfile.replace('public/', '') }))
     };
     const fs = require('fs');
     const path = require('path');
     fs.writeFileSync(
-      path.join(__dirname, 'public', 'build', 'manifest.json'),
+      path.join(__dirname, '..', 'public', 'build', 'manifest.json'),
       JSON.stringify(manifest, null, 2)
     );
-    console.log('Build completed');
+    console.log('[build] Assets compiled');
+
+    if (isDist) {
+      console.log('[build] Starting dist packaging');
+      await buildDist();
+      console.log('[build] Dist packaging complete');
+    }
   } catch (err) {
     console.error('Build failed', err);
     process.exit(1);

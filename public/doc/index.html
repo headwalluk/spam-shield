@@ -1,50 +1,50 @@
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Documentation - Spam Shield</title>
     <link rel="icon" type="image/webp" href="/headwall-icon.webp" />
-    <link rel="preload" href="/build/bundle.css" as="style" />
     <link rel="stylesheet" href="/build/bundle.css" />
-    <script defer src="/build/bundle.js"></script>
   </head>
   <body>
-    <div id="header-placeholder"></div>
+    <header id="header-placeholder"></header>
     <main class="container py-4">
-      <h1 class="mb-4">Documentation</h1>
+      <h1 class="h4 mb-3">Documentation</h1>
       <p class="lead">Resources for integrating and understanding Spam Shield.</p>
       <div class="row g-4">
         <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
-              <h2 class="h5 card-title">API Reference (Swagger)</h2>
+              <h2 class="h6 card-title mb-2">API Reference (Swagger)</h2>
               <p class="card-text">Interactive OpenAPI docs for all available endpoints.</p>
-              <a href="/doc/api" class="btn btn-primary btn-sm">View Swagger UI</a>
-              <a href="/api-docs.json" class="btn btn-outline-secondary btn-sm"
-                >Download JSON Spec</a
-              >
+              <div class="d-flex gap-2 flex-wrap">
+                <a href="/doc/api" class="btn btn-primary btn-sm">Swagger UI</a>
+                <a href="/api-docs.json" class="btn btn-outline-secondary btn-sm">JSON Spec</a>
+              </div>
             </div>
           </div>
         </div>
         <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
-              <h2 class="h5 card-title">Guides</h2>
+              <h2 class="h6 card-title mb-2">Guides</h2>
               <p class="card-text mb-2">Deep dives and conceptual docs.</p>
-              <ul class="mb-3">
+              <ul class="mb-3 small">
                 <li><a href="/docs/ip-address-reputation.html">IP Address Reputation</a></li>
                 <li><a href="/docs/message-classification.html">Message Classification</a></li>
                 <li><a href="/docs/rest-api.html">REST API Overview</a></li>
               </ul>
-              <p class="small text-muted">
-                Legacy docs paths preserved; may migrate to /doc/ in future.
+              <p class="text-muted mb-0 small">
+                Paths under /docs/ remain for deep links; may consolidate later.
               </p>
             </div>
           </div>
         </div>
       </div>
     </main>
-    <div id="footer-placeholder" class="mt-5"></div>
+    <footer id="footer-placeholder"></footer>
+    <script src="/build/bundle.js"></script>
+    <!-- Optional: add a dedicated docs bundle if interactive features are needed -->
   </body>
 </html>

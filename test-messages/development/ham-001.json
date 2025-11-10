@@ -1,0 +1,20 @@
+{
+  "message": "Hi. Sint do aliqua minim, exercitation aute. Quis esse aliqua. Laborum tempor deserunt voluptate et, irure, ut nostrud sed. Many thanks",
+  "fields": {
+    "first-name": "John",
+    "last-name": "Doe",
+    "your-email": "john.doe@example.com"
+  },
+  "hints": {
+    "forceToSpam": false,
+    "countryRestrictions": {
+      "mode": "blockList",
+      "countryCodes": ["CN", "IN", "LT", "RU", "SG", "UA", "VN"]
+    },
+    "scriptRestriction": {
+      "alphabet": "westernLatin",
+      "mode": "minimumCharacterPercentage",
+      "threshold": 0.2
+    }
+  }
+}

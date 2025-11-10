@@ -1,14 +1,14 @@
 {
   "name": "spam-shield",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A Node.js application for spam detection and IP reputation management.",
   "main": "src/server.js",
   "scripts": {
     "start": "NODE_ENV=production node src/server.js",
     "dev": "concurrently -n server,assets -c green,blue \"nodemon src/server.js\" \"npm:build -- --watch\"",
     "clean": "rimraf dist && rimraf public/build/*",
-    "build": "npm run clean && node build.js",
-    "build:dist": "npm run build && node scripts/build-dist.js",
+    "build": "npm run clean && node scripts/build.js",
+    "build:dist": "npm run clean && node scripts/build.js --dist",
     "test": "jest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

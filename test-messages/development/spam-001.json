@@ -1,0 +1,20 @@
+{
+  "message": "DeAr ADMINISTRATOR. Sexy bitcoin casino girls & slot games waiting for you! Click here to join the fun and win big $$$!!!",
+  "fields": {
+    "first-name": "John",
+    "last-name": "Doe",
+    "your-email": "j.o.h.n.d.o.e.1234@example.com"
+  },
+  "hints": {
+    "forceToSpam": false,
+    "countryRestrictions": {
+      "mode": "blockList",
+      "countryCodes": ["CN", "IN", "LT", "RU", "SG", "UA", "VN"]
+    },
+    "scriptRestriction": {
+      "alphabet": "westernLatin",
+      "mode": "minimumCharacterPercentage",
+      "threshold": 0.2
+    }
+  }
+}

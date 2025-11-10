@@ -25,23 +25,6 @@ if (!window.assertBootstrapReady) {
 }
 import './theme.js';
 
-async function inject(id, url) {
-  const placeholder = document.getElementById(id);
-  if (!placeholder) {
-    return;
-  }
-  try {
-    const res = await fetch(url, { credentials: 'same-origin' });
-    if (!res.ok) {
-      throw new Error(`${res.status} ${res.statusText}`);
-    }
-    const html = await res.text();
-    placeholder.innerHTML = html;
-  } catch (err) {
-    console.warn(`[layout] Failed to load ${url}:`, err.message);
-  }
-}
-
 async function renderNav() {
   try {
     const res = await fetch('/api/v3/state', { credentials: 'same-origin' });
@@ -98,30 +81,6 @@ async function renderNav() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Inject partials first
-  await inject('header-placeholder', '/partials/header.html');
-  await inject('footer-placeholder', '/partials/footer.html');
-
-  // Manually initialize Bootstrap components within the injected footer
-  const footer = document.getElementById('footer-placeholder');
-  if (footer) {
-    // console.log( `Loaded footer`);
-    /**
-     * REMOVED: Not needed in Bootstrap 5
-    // Initialize dropdowns (now dropups in the footer)
-    const dropdownElementList = [].slice.call(
-      footer.querySelectorAll('[data-bs-toggle="dropdown"]')
-    );
-    dropdownElementList.map(function (dropdownToggleEl) {
-      return new window.bootstrap.Dropdown(dropdownToggleEl);
-    });
-     */
-
-    // Initialize theme controls
-    if (typeof window.ThemeSwitcherInit === 'function') {
-      window.ThemeSwitcherInit();
-    }
-  }
-
+  // Partials are injected server-side; just render dynamic nav actions.
   await renderNav();
 });

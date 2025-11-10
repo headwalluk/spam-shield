@@ -5,7 +5,7 @@ exports.seed = async function (knex) {
   if (count > 0) {
     return;
   } // idempotent
-  
+
   await knex('salutations').insert([
     { phrase: 'hello', score: 0 },
     { phrase: 'hi', score: 0 },

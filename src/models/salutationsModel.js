@@ -1,26 +1,26 @@
 const db = require('../db/knex');
 
+/**
+ * Salutations model.
+ * - CRUD operations interact directly with the database for REST API endpoints.
+ * - In-memory cache is maintained separately for fast classification lookups.
+ */
 class SalutationsModel {
   constructor() {
-    this._items = [];
-    this._byId = new Map();
-    this._byPhrase = new Map();
-    this._lastReload = 0;
+    // In-memory cache for classification (loaded via loadCache)
+    this._cache = []; // array of { id, phrase, score }
+    this._cacheByPhrase = new Map();
+    this._lastCacheLoad = 0;
   }
 
-  async reload() {
-    const rows = await db('salutations').select('*').orderBy('phrase');
-    this._items = rows.map((r) => ({ id: Number(r.id), phrase: r.phrase, score: Number(r.score) }));
-    this._byId.clear();
-    this._byPhrase.clear();
-    for (const r of this._items) {
-      this._byId.set(r.id, r);
-      this._byPhrase.set(r.phrase.toLowerCase(), r);
-    }
-    this._lastReload = Date.now();
-    return this._items;
-  }
+  // ============================================
+  // Database CRUD operations (for REST API)
+  // ============================================
 
+  /**
+   * List salutations with pagination and optional search filter.
+   * Queries the database directly.
+   */
   async listPaged({ page = 1, limit = 10, search = '' }) {
     const p = Math.max(1, Number(page) || 1);
     const l = Math.min(100, Math.max(1, Number(limit) || 10));
@@ -48,25 +48,31 @@ class SalutationsModel {
     };
   }
 
-  findById(id) {
-    return this._byId.get(Number(id)) || null;
-  }
-  findByPhrase(phrase) {
-    if (!phrase) {
+  /**
+   * Fetch a single salutation by ID from the database.
+   */
+  async findById(id) {
+    const row = await db('salutations').where({ id }).first();
+    if (!row) {
       return null;
     }
-    return this._byPhrase.get(phrase.toLowerCase()) || null;
-  }
-  getAll() {
-    return this._items.slice();
+    return { id: Number(row.id), phrase: row.phrase, score: Number(row.score) };
   }
 
+  /**
+   * Create a new salutation in the database.
+   * Default score is 0 (neutral/ham indicator).
+   * Does NOT automatically reload the cache; call loadCache() separately if needed.
+   */
   async create({ phrase, score = 0 }) {
     const [id] = await db('salutations').insert({ phrase, score });
-    await this.reload();
     return this.findById(id);
   }
 
+  /**
+   * Update an existing salutation in the database.
+   * Does NOT automatically reload the cache; call loadCache() separately if needed.
+   */
   async update(id, { phrase, score }) {
     const updates = {};
     if (phrase !== undefined) {
@@ -75,14 +81,57 @@ class SalutationsModel {
     if (score !== undefined) {
       updates.score = score;
     }
-    await db('salutations').where({ id }).update(updates);
-    await this.reload();
+    const count = await db('salutations').where({ id }).update(updates);
+    if (count === 0) {
+      return null;
+    }
     return this.findById(id);
   }
 
-  async remove(id) {
-    await db('salutations').where({ id }).del();
-    await this.reload();
+  /**
+   * Delete a salutation from the database.
+   * Does NOT automatically reload the cache; call loadCache() separately if needed.
+   */
+  async delete(id) {
+    const count = await db('salutations').where({ id }).del();
+    return count > 0;
+  }
+
+  // ============================================
+  // Cache management (for classification)
+  // ============================================
+
+  /**
+   * Load all salutations into memory for fast classification lookups.
+   * Call this at startup and after CRUD operations if you want immediate consistency.
+   */
+  async loadCache() {
+    const rows = await db('salutations').select('*').orderBy('phrase');
+    this._cache = rows.map((r) => ({ id: Number(r.id), phrase: r.phrase, score: Number(r.score) }));
+    this._cacheByPhrase.clear();
+    for (const r of this._cache) {
+      this._cacheByPhrase.set(r.phrase.toLowerCase(), r);
+    }
+    this._lastCacheLoad = Date.now();
+    return this._cache.length;
+  }
+
+  /**
+   * Get all cached salutations for classification.
+   * Returns an empty array if cache not loaded yet.
+   */
+  getPhrasesForClassification() {
+    return this._cache.slice();
+  }
+
+  /**
+   * Check if a salutation exists in the cache (for classification).
+   */
+  findInCache(phrase) {
+    if (!phrase) {
+      return null;
+    }
+    return this._cacheByPhrase.get(phrase.toLowerCase()) || null;
   }
 }
 

@@ -10,6 +10,7 @@ const v3UsersRouter = require('./v3/users');
 const v3ApiKeysRouter = require('./v3/api-keys');
 const v3BadPhrasesRouter = require('./v3/bad-phrases');
 const v3SalutationsRouter = require('./v3/salutations');
+const dashRouter = require('./dash');
 const v3StateRouter = require('./v3/state');
 
 const router = express.Router();
@@ -69,5 +70,7 @@ router.use('/v3/api-keys', v3ApiKeysRouter);
 router.use('/v3/state', v3StateRouter);
 router.use('/v3/bad-phrases', v3BadPhrasesRouter);
 router.use('/v3/salutations', v3SalutationsRouter);
+// Dashboard-specific helper APIs
+router.use('/dash', dashRouter);
 
 module.exports = router;
